@@ -6,7 +6,7 @@ import os
 packages.urllib3.disable_warnings()
 
 
-def getcookie(key):
+def getcookie():
     url = 'https://api.m.jd.com/client.action'
     headers = {
         'cookie': os.environ.get('wsKey'),
@@ -26,17 +26,10 @@ def getcookie(key):
         'sign': os.environ.get('sign'),
         'sv': os.environ.get('sv')
     }
-#     print(f"{params}")
-#     params = os.environ.get('SIGN')
-
-#     data = 'body=%7B%22to%22%3A%22https%253a%252f%252fplogin.m.jd.com%252fjd-mlogin%252fstatic%252fhtml%252fappjmp_blank.html%22%7D&'
-    data = os.environ.get('BODY')
+    data = os.environ.get('body')
     aa= post(url=url, headers=headers, params=params, data=data, verify=False)
     totokenKey = aa.json()['tokenKey']
     url = 'https://un.m.jd.com/cgi-bin/app/appjmp'
-
-
-
     params = {
         'tokenKey': totokenKey,
         'to': 'https://plogin.m.jd.com/cgi-bin/m/thirdapp_auth_page?token='+totokenKey,
@@ -45,19 +38,13 @@ def getcookie(key):
         'appup_type': 1,
     }
     res = get(url=url, params=params, verify=False, allow_redirects=False).cookies.get_dict()
-    print(f"{res}")
     pt_pin = res['pt_pin']
     cookie = f"pt_key={res['pt_key']};pt_pin={pt_pin};"
-    print(f"{res}")
     print(f"{cookie}")
-    return pt_pin, cookie
+    return params
 
 def main():
-    cc = os.environ
-#     print(f"{os.environ.get('BODY')}")
-#     print(f"{os.environ.get('SIGN')}")
-#     print(f"111 {os.environ.json()}")
-    pin, cookie = getcookie('pin=xxxxx;wskey=xxxxxx;')
+      getcookie()
 
 if __name__ == '__main__':
     main()

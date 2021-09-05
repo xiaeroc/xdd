@@ -204,7 +204,7 @@ func UpdateCk(msg string) string {
 			Save <- &JdCookie{}
 		}()
 	}
-	return ""
+	return fmt.Sprintf("更新失败，%s", msg)
 }
 func findShareCode(msg string) string {
 	o := false
