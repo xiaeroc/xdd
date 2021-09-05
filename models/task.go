@@ -179,7 +179,7 @@ func runTask(task *Task, sender *Sender) string {
 		}
 	}
 	if task.Name == "Jd_UpdateCk.py" {
-
+		sender.Reply(msg)
 	} else if msg != "" {
 		sender.Reply(msg)
 	}
@@ -204,7 +204,7 @@ func UpdateCk(msg string) string {
 			Save <- &JdCookie{}
 		}()
 	}
-	return "更新失败"
+	return ""
 }
 func findShareCode(msg string) string {
 	o := false
