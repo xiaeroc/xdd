@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	beego "github.com/beego/beego/v2/server/web"
-	"github.com/cdle/xdd/models"
 	"github.com/go-playground/locales/zh"
 	ut "github.com/go-playground/universal-translator"
+	"github.com/xiaeroc/xdd/models"
 	"gopkg.in/go-playground/validator.v9"
 	zh_translations "gopkg.in/go-playground/validator.v9/translations/zh"
 )

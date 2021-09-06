@@ -172,7 +172,7 @@ var codeSignals = []CodeSignal{
 			//if err != nil {
 			//	return nil
 			//}
-			return "私聊发送CK给机器人即可，格式: pt_key=xxxx;pt_pin=xxxx;\n不会抓取CK请私聊群主，wsKey上车请私聊群主"
+			return "私聊发送CK给机器人即可，格式: pt_key=xxxx;pt_pin=xxxx;\n不会抓取CK请私聊群主，wsKey上车请私聊群主\n直接抓到的Ck中间有空格！！！！ 请去掉再发给机器人"
 		},
 	},
 	{
