@@ -283,13 +283,16 @@ func CheckLogin(token, cookie, okl_token string) (string, *models.JdCookie) {
 			if nck.Hack == models.True {
 				ck.Update(models.Hack, models.False)
 			}
-			for i := range Config.Containers {
-				(&Config.Containers[i]).write(cks)
+			for i := range models.Config.Containers {
+				(&models.Config.Containers[i]).Write([]models.JdCookie{ck})
 			}
 		} else {
 			models.NewJdCookie(&ck)
 			msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 			(&models.JdCookie{}).Push(msg)
+			for i := range models.Config.Containers {
+				(&models.Config.Containers[i]).Write([]models.JdCookie{ck})
+			}
 			logs.Info(msg)
 		}
 		go func() {

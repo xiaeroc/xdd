@@ -80,7 +80,7 @@ module.exports = cookies`, cookies))
 					(&Config.Containers[i]).read()
 				}
 				for i := range Config.Containers {
-					(&Config.Containers[i]).write(cks)
+					(&Config.Containers[i]).Write(cks)
 				}
 			} else {
 				resident := []JdCookie{}
@@ -164,10 +164,10 @@ module.exports = cookies`, cookies))
 					break
 				}
 				for i := range bs {
-					bs[i].Container.write(append(resident, bs[i].Ready...))
+					bs[i].Container.Write(append(resident, bs[i].Ready...))
 				}
 				for i := range parallels {
-					parallels[i].write(append(resident, bat...))
+					parallels[i].Write(append(resident, bat...))
 				}
 			}
 			if init {
