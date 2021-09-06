@@ -23,22 +23,25 @@ const (
 )
 
 type Container struct {
-	Type      string
-	Name      string
-	Default   bool
-	Address   string
-	Username  string
-	Password  string
-	Path      string
-	Version   string
-	Token     string
-	Available bool
-	Delete    []string
-	Weigth    int
-	Mode      string
-	Reader    *bufio.Reader
-	Config    string
-	Limit     int
+	Type         string
+	Name         string
+	Default      bool
+	Address      string
+	Username     string
+	Password     string
+	ClientId     string `yaml:"client_id"`
+	ClientSecret string `yaml:"client_secret"`
+	Path         string
+	Version      string
+	QlVersion    string
+	Token        string
+	Available    bool
+	Delete       []string
+	Weigth       int
+	Mode         string
+	Reader       *bufio.Reader
+	Config       string
+	Limit        int
 }
 
 func initContainer() {
@@ -54,9 +57,10 @@ func initContainer() {
 			} else {
 				logs.Warn("%s地址错误", Config.Containers[i].Type)
 			}
+
 			version, err := GetQlVersion(Config.Containers[i].Address)
 			if err == nil {
-				if Config.Containers[i].getToken() == nil {
+				if Config.Containers[i].getToken(version) == nil {
 					logs.Info("青龙" + version + "登录成功")
 				} else {
 					logs.Warn("青龙" + version + "登录失败")
@@ -110,7 +114,7 @@ func initContainer() {
 
 }
 
-func (c *Container) write(cks []JdCookie) error {
+func (c *Container) Write(cks []JdCookie) error {
 	switch c.Type {
 	case "ql":
 		if c.Version == "2.8" {
@@ -410,21 +414,39 @@ func (c *Container) read() error {
 	return nil
 }
 
-func (c *Container) getToken() error {
-	req := httplib.Post(c.Address + "/api/login")
-	req.Header("Content-Type", "application/json;charset=UTF-8")
-	req.Body(fmt.Sprintf(`{"username":"%s","password":"%s"}`, c.Username, c.Password))
-	if rsp, err := req.Response(); err == nil {
-		data, err := ioutil.ReadAll(rsp.Body)
-		if err != nil {
+func (c *Container) getToken(version string) error {
+	if c.Version == "2.9" {
+		req := httplib.Get(c.Address + fmt.Sprintf("/open/auth/token?client_id=%s&client_secret=%s", c.ClientId, c.ClientSecret))
+		req.Header("Content-Type", "application/json;charset=UTF-8")
+		//req.Body(fmt.Sprintf(`{"username":"%s","password":"%s"}`, c.Username, c.Password))
+		if rsp, err := req.Response(); err == nil {
+			data, err := ioutil.ReadAll(rsp.Body)
+			if err != nil {
+				return err
+			}
+			c.Token, _ = jsonparser.GetString(data, "token")
+			if c.Token == "" {
+				c.Token, _ = jsonparser.GetString(data, "data", "token")
+			}
+		} else {
 			return err
 		}
-		c.Token, _ = jsonparser.GetString(data, "token")
-		if c.Token == "" {
-			c.Token, _ = jsonparser.GetString(data, "data", "token")
-		}
 	} else {
-		return err
+		req := httplib.Post(c.Address + "/api/login")
+		req.Header("Content-Type", "application/json;charset=UTF-8")
+		req.Body(fmt.Sprintf(`{"username":"%s","password":"%s"}`, c.Username, c.Password))
+		if rsp, err := req.Response(); err == nil {
+			data, err := ioutil.ReadAll(rsp.Body)
+			if err != nil {
+				return err
+			}
+			c.Token, _ = jsonparser.GetString(data, "token")
+			if c.Token == "" {
+				c.Token, _ = jsonparser.GetString(data, "data", "token")
+			}
+		} else {
+			return err
+		}
 	}
 	return nil
 }
@@ -435,7 +457,11 @@ func (c *Container) request(ss ...string) ([]byte, error) {
 		if s == GET || s == POST || s == PUT || s == DELETE {
 			method = s
 		} else if strings.Contains(s, "/api/") {
-			api = s
+			if c.Version == "2.9" {
+				api = strings.Replace(s, "api", "open", 1)
+			} else {
+				api = s
+			}
 		} else {
 			body = s
 		}
@@ -468,7 +494,7 @@ func (c *Container) request(ss ...string) ([]byte, error) {
 				if i >= 5 {
 					return nil, errors.New("异常")
 				}
-				c.getToken()
+				c.getToken(c.Version)
 			}
 		}
 	}

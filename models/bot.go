@@ -133,12 +133,15 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 								}
 								NewJdCookie(&ck)
 								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
-								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin ))
+								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
 								logs.Info(msg)
+							}
+							for i := range Config.Containers {
+								(&Config.Containers[i]).Write([]JdCookie{ck})
 							}
 						}
 					} else {
-						sender.Reply(fmt.Sprintf("无效账号，%s",ck.PtPin))
+						sender.Reply(fmt.Sprintf("无效账号，%s", ck.PtPin))
 					}
 				}
 				go func() {

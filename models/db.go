@@ -62,10 +62,10 @@ func HasPin(pin string) bool {
 }
 
 func HasKey(key string) bool {
-	if _, ok := keys[key]; ok {
-		return ok
-	}
-	keys[key] = true
+	//if _, ok := keys[key]; ok {
+	//	return ok
+	//}
+	//keys[key] = true
 	return false
 }
 
