@@ -12,8 +12,8 @@ import (
 
 	"github.com/beego/beego/v2/server/web"
 	"github.com/cdle/xdd/controllers"
-	"github.com/cdle/xdd/models"
 	"github.com/cdle/xdd/qbot"
+	"github.com/xiaeroc/xdd/models"
 )
 
 var theme = ""

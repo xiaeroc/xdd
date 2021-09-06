@@ -23,7 +23,7 @@ func init() {
 	initConfig()
 	initDB()
 	go initVersion()
-	go initUserAgent()
+	//go initUserAgent()
 	initContainer()
 	initHandle()
 	initCron()

@@ -100,7 +100,7 @@ func initConfig() {
 		Config.Node = "node"
 	}
 	if Config.Python == "" {
-		Config.Python = "python3"
+		Config.Python = "python"
 	}
 	if Config.Pip == "" {
 		Config.Pip = "pip3"

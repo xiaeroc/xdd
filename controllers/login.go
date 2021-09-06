@@ -10,11 +10,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/beego/beego/v2/core/logs"
-	"github.com/cdle/xdd/models"
-
 	"github.com/beego/beego/v2/client/httplib"
+	"github.com/beego/beego/v2/core/logs"
 	qrcode "github.com/skip2/go-qrcode"
+	"github.com/xiaeroc/xdd/models"
 )
 
 type LoginController struct {
@@ -283,6 +282,9 @@ func CheckLogin(token, cookie, okl_token string) (string, *models.JdCookie) {
 			logs.Info(msg)
 			if nck.Hack == models.True {
 				ck.Update(models.Hack, models.False)
+			}
+			for i := range Config.Containers {
+				(&Config.Containers[i]).write(cks)
 			}
 		} else {
 			models.NewJdCookie(&ck)
