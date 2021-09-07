@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>清梦</title>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/a251231/mass@main/panel/js/skel.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.5/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.jsdelivr.net/gh/a251231/mass@main/panel/css/other.css?66886666">
+    <link rel="icon" type="image/x-icon" href="https://github.com/favicon.ico"/>
+    <link rel="stylesheet" type="text/css"
+          href="https://cdn.jsdelivr.net/gh/a251231/mass@main/panel/css/sweetalert.css">
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <script type="text/javascript"
+            src="https://cdn.jsdelivr.net/gh/a251231/mass@main/panel/js/sweetalert-dev.js"></script>
+</head>
+<style lang="scss">
+    .button {
+        background: transparent !important;
+        color: white;
+    }
+</style>
+<body class="landing">
+<script type="text/javascript" color="255,255,255" opacity='0.7' zIndex="auto" count="200"
+        src="https://cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+<div id="page-wrapper">
+
+    <section id="banner">
+        <div class="inner">
+            <h2>人生苦短，何必烦忧</h2>
+            <p>点击下方按钮开始使用</p>
+            <ul class="actions">
+                <div>
+                </div>
+                <li>
+                    <el-button id="loginCookie" @click="GetQrCode" class="button" title="注意事项">注意事项</el-button>
+                    <el-button id="loginCookie" @click="visible = true" class="button" title="CK登录">CK登录</el-button>
+
+                    <el-button id="loginCookie" class="button" title="获取CK教程"><a
+                            style="text-decoration: none;color: red" target="_blank"
+                            href="http://blog.yuannian1112.top/category/jd/">获取CK教程</a></el-button>
+                    <el-dialog :visible.sync="visible" title="登录">
+                        <el-radio-group v-model="radio">
+                            <el-radio-button label="ck">CK登录</el-radio-button>
+                            <el-radio-button label="wsKey">wsKey登录</el-radio-button>
+                        </el-radio-group>
+                        <span>
+                            <el-input v-model="ck" type="textarea" :autosize="{ minRows: 2, maxRows: 4}"
+                                      placeholder="请输入"></el-input>
+                        </span>
+                        <span slot="footer" class="dialog-footer">
+                            <el-button @click="visible = false">取 消</el-button>
+                            <el-button type="primary" @click="loginCookie">登 录</el-button>
+                        </span>
+                    </el-dialog>
+                </li>
+            </ul>
+            <p>
+                <a target="_blank" style="color:red;font-weight:bold" onclick="QQCode()"> [QQ通知群]</a><br>
+                <a href="https://t.me/qing_meng" target="_blank" style="color:red;font-weight:bold"> [TG群]</a><br>
+                <a style="color:#00effb;font-weight:bold"> [全自动运行]</a>
+                <br/> <a style="font-size:12px;"> App确认后即可（无视升级提示）</a>
+                <br/> <a style="font-size:12px;">未添加过的用户会自动新增账号，若已添加则会自动更新有效期（一个月）</a>
+            </p>
+
+            <div class="more">
+                <br/>欢迎🧡使用
+
+            </div>
+        </div>
+    </section>
+</div>
+</body>
+<script>
+    new Vue({
+        el: '#page-wrapper',
+        data: function () {
+            return {
+                visible: false,
+                radio: 'ck',
+                ck: '',
+                wsKey: ''
+            }
+        },
+        created: function () {
+            console.log("xxxx")
+        },
+        methods: {
+            GetQrCode() {
+                swal("请务必看一遍", "✌️京东APP扫码后 页面跳转即为成功✌️\n❤️打开APP完成新手任务❤️\n❣️京东❣️➨我的➨更多工具➨(农场、萌宠、工厂、宠汪汪、金榜创造营、领现金、健康社区、种豆得豆)\n❣️京喜❣️➨我的➨(农场、牧场、工厂、财富岛)\n❣️金融❣️➨我的➨(种摇钱树、天天提鹅、养猪猪)\n☂️京东账号绑定微信可以更多¥¥☂️\n☠️请关闭免密支付☠️", "success")
+                console.log("xxxx")
+            },
+            loginCookie() {
+                var xmlhttp = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
+                xmlhttp.onreadystatechange = function () {
+                    if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+                        var results = xmlhttp.responseText;
+                        console.log(results);
+                        switch (results) {
+                            case "重复添加":
+                            case "无效账号":
+                                this.$message.error(results);
+                                break;
+                            case "添加账号":
+                            case "更新账号":
+                                this.$message({
+                                    message: results,
+                                    type: 'success'
+                                });
+                                break;
+                        }
+                    }
+                }
+                xmlhttp.open("POST", "/api/login/ck", true);
+                var data = new FormData();
+                data.append('ck', this.ck);
+                xmlhttp.send(data);
+            }
+
+
+        }
+    })
+</script>
+</html>
