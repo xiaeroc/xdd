@@ -153,6 +153,7 @@ func runTask(task *Task, sender *Sender) string {
 	msg := ""
 	reader := bufio.NewReader(stdout)
 	st := time.Now()
+	upckMsg := ""
 	for {
 		line, err2 := reader.ReadString('\n')
 		if err2 != nil || io.EOF == err2 {
@@ -167,7 +168,7 @@ func runTask(task *Task, sender *Sender) string {
 		if task.Name == "Jd_UpdateCk.py" {
 			rt := UpdateCk(line)
 			if rt != "" {
-				sender.Reply(rt)
+				upckMsg = upckMsg + "\n" + rt
 			}
 		}
 		msg += line
@@ -179,7 +180,8 @@ func runTask(task *Task, sender *Sender) string {
 		}
 	}
 	if task.Name == "Jd_UpdateCk.py" {
-		sender.Reply(msg)
+		//sender.Reply(msg)
+		msg = upckMsg
 	} else if msg != "" {
 		sender.Reply(msg)
 	}
