@@ -53,6 +53,9 @@
                             <el-input v-model="ck" type="textarea" :autosize="{ minRows: 2, maxRows: 4}"
                                       placeholder="请输入"></el-input>
                         </span>
+                        <span>
+                            <el-input v-model="qq" type="text" placeholder="添加Q群后能收到活动通知"><template slot="prepend">通知QQ</template></el-input>
+                        </span>
                         <el-alert
                                 title="格式: pt_key=xxxx;pt_pin=xxxx;"
                                 type="warning">
@@ -88,7 +91,8 @@
                 visible: false,
                 radio: 'ck',
                 ck: '',
-                wsKey: ''
+                wsKey: '',
+                qq: ''
             }
         },
         created: function () {
@@ -129,7 +133,8 @@
                 }
                 xmlhttp.open("POST", "/api/login/ck", true);
                 var data = new FormData();
-                data.append('ck', this.ck);
+                data.append(this.radio, this.ck);
+                data.append("qq", this.qq);
                 xmlhttp.send(data);
             }
         }

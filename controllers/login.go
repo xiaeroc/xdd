@@ -236,7 +236,7 @@ func (c *LoginController) CkLogin() {
 	body := c.Ctx.Request.PostForm
 	cookies := body.Get("ck")
 	wsKey := body.Get("wsKey")
-	qq, _ := strconv.ParseInt(body.Get("qq"), 10, 64)
+	qq, qqerr := strconv.ParseInt(body.Get("qq"), 10, 64)
 	if cookies != "" {
 		pt_key := FetchJdCookieValue("pt_key", cookies)
 		pt_pin := FetchJdCookieValue("pt_pin", cookies)
@@ -244,6 +244,7 @@ func (c *LoginController) CkLogin() {
 			ck := models.JdCookie{
 				PtKey: pt_key,
 				PtPin: pt_pin,
+				QQ:    int(qq),
 				Hack:  models.True,
 			}
 			if models.CookieOK(&ck) {
@@ -255,13 +256,19 @@ func (c *LoginController) CkLogin() {
 						nck.InPool(ck.PtKey)
 						msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
 						logs.Info(msg)
-						go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+						if qqerr == nil {
+							go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+						}
+						go models.SendQQ(models.Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
 						c.Ctx.WriteString("更新账号")
 					} else {
 						models.NewJdCookie(&ck)
 						msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 						logs.Info(msg)
-						go models.SendQQ(int64(qq), fmt.Sprintf("添加账号，%s", ck.PtPin))
+						if qqerr == nil {
+							go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+						}
+						go models.SendQQ(models.Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
 						c.Ctx.WriteString("添加账号")
 					}
 					for i := range models.Config.Containers {
@@ -270,13 +277,26 @@ func (c *LoginController) CkLogin() {
 					return
 				}
 			} else {
-				go models.SendQQ(int64(qq), "无效账号")
+				if qqerr == nil {
+					go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+				}
 				c.Ctx.WriteString("无效账号")
 				return
 			}
 		}
 	} else if wsKey != "" {
-
+		pin := FetchJdCookieValue("pin", cookies)
+		wskey_str := FetchJdCookieValue("wskey", cookies)
+		if pin != "" && wskey_str != "" {
+			ws := models.JdCookie{
+				PtPin: pin,
+				Wskey: wskey_str,
+				Hack:  models.True,
+			}
+			models.NewJdCookie(&ws)
+		}
+		c.Ctx.WriteString("暂未开放网页添加wsKey")
+		return
 	}
 	c.Ctx.WriteString("无效账号")
 }
