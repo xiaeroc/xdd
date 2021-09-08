@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -226,6 +227,78 @@ func (c *LoginController) Query() {
 			}
 		}
 	}
+}
+func myPost() {
+
+}
+
+func (c *LoginController) CkLogin() {
+	body := c.Ctx.Request.PostForm
+	cookies := body.Get("ck")
+	wsKey := body.Get("wsKey")
+	qq, qqerr := strconv.ParseInt(body.Get("qq"), 10, 64)
+	if cookies != "" {
+		pt_key := FetchJdCookieValue("pt_key", cookies)
+		pt_pin := FetchJdCookieValue("pt_pin", cookies)
+		if pt_key != "" && pt_pin != "" {
+			ck := models.JdCookie{
+				PtKey: pt_key,
+				PtPin: pt_pin,
+				QQ:    int(qq),
+				Hack:  models.True,
+			}
+			if models.CookieOK(&ck) {
+				if models.HasKey(ck.PtKey) {
+					c.Ctx.WriteString("重复添加")
+					return
+				} else {
+					if nck, err := models.GetJdCookie(ck.PtPin); err == nil {
+						nck.InPool(ck.PtKey)
+						msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+						logs.Info(msg)
+						if qqerr == nil {
+							go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+						}
+						go models.SendQQ(models.Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
+						c.Ctx.WriteString("更新账号")
+					} else {
+						models.NewJdCookie(&ck)
+						msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
+						logs.Info(msg)
+						if qqerr == nil {
+							go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+						}
+						go models.SendQQ(models.Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
+						c.Ctx.WriteString("添加账号")
+					}
+					for i := range models.Config.Containers {
+						(&models.Config.Containers[i]).Write([]models.JdCookie{ck})
+					}
+					return
+				}
+			} else {
+				if qqerr == nil {
+					go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+				}
+				c.Ctx.WriteString("无效账号")
+				return
+			}
+		}
+	} else if wsKey != "" {
+		pin := FetchJdCookieValue("pin", cookies)
+		wskey_str := FetchJdCookieValue("wskey", cookies)
+		if pin != "" && wskey_str != "" {
+			ws := models.JdCookie{
+				PtPin: pin,
+				Wskey: wskey_str,
+				Hack:  models.True,
+			}
+			models.NewJdCookie(&ws)
+		}
+		c.Ctx.WriteString("暂未开放网页添加wsKey")
+		return
+	}
+	c.Ctx.WriteString("无效账号")
 }
 
 func CheckLogin(token, cookie, okl_token string) (string, *models.JdCookie) {
