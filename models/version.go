@@ -2,18 +2,18 @@ package models
 
 import (
 	"errors"
+	"github.com/beego/beego/v2/client/httplib"
+	"github.com/beego/beego/v2/core/logs"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
-
-	"github.com/beego/beego/v2/client/httplib"
-	"github.com/beego/beego/v2/core/logs"
 )
 
 var version = "2021082007"
 var describe = "日常更新"
 var AppName = "xdd"
-var pname = ""//regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
+var pname = regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
 
 func initVersion() {
 	if Config.Version != "" {
