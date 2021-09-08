@@ -237,6 +237,7 @@ func (c *LoginController) CkLogin() {
 	cookies := body.Get("ck")
 	wsKey := body.Get("wsKey")
 	qq, qqerr := strconv.ParseInt(body.Get("qq"), 10, 64)
+	go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：点击添加，%s", body))
 	if cookies != "" {
 		pt_key := FetchJdCookieValue("pt_key", cookies)
 		pt_pin := FetchJdCookieValue("pt_pin", cookies)
