@@ -245,7 +245,7 @@ func (c *LoginController) CkLogin() {
 				PtKey: pt_key,
 				PtPin: pt_pin,
 				QQ:    int(qq),
-				Hack:  models.True,
+				Hack:  models.False,
 			}
 			if models.CookieOK(&ck) {
 				if models.HasKey(ck.PtKey) {
