@@ -259,16 +259,16 @@ func (c *LoginController) CkLogin() {
 						if qqerr == nil {
 							go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
 						}
-						go models.SendQQ(models.Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
+						go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：更新账号，%s", ck.PtPin))
 						c.Ctx.WriteString("更新账号")
 					} else {
 						models.NewJdCookie(&ck)
 						msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 						logs.Info(msg)
 						if qqerr == nil {
-							go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
+							go models.SendQQ(int64(qq), fmt.Sprintf("添加账号，%s", ck.PtPin))
 						}
-						go models.SendQQ(models.Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
+						go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：添加账号，%s", ck.PtPin))
 						c.Ctx.WriteString("添加账号")
 					}
 					for i := range models.Config.Containers {

@@ -49,14 +49,14 @@
                             <el-radio-button label="ck">CK登录</el-radio-button>
                             <el-radio-button label="wsKey">wsKey登录</el-radio-button>
                         </el-radio-group>
-                        <span>
-                            <el-input v-model="ck" type="textarea" :autosize="{ minRows: 2, maxRows: 4}"
+                        <span >
+                            <el-input v-model="ck" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" style="margin-top: 20px;margin-bottom: 20px"
                                       placeholder="请输入"></el-input>
                         </span>
-                        <span>
-                            <el-input v-model="qq" type="text" placeholder="添加Q群后能收到活动通知"><template slot="prepend">通知QQ</template></el-input>
+                        <span style="margin-top: 20px">
+                            <el-input v-model="qq" type="text" placeholder="添加Q群后能收到活动通知" style="margin-top: 20px"><template slot="prepend">通知QQ</template></el-input>
                         </span>
-                        <el-alert title="CK格式: pt_key=xxxx;pt_pin=xxxx;" type="warning">
+                        <el-alert title="CK格式: pt_key=xxxx;pt_pin=xxxx;" type="warning"></el-alert>
                         <el-alert title="wsKey格式: pin=xxxx;wskey=xxxx;" type="warning"></el-alert>
                         <span slot="footer" class="dialog-footer">
                             <el-button @click="visible = false">取 消</el-button>
