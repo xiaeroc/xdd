@@ -40,10 +40,14 @@
                 <li>
                     <el-button id="loginCookie" @click="GetQrCode" class="button" title="注意事项">注意事项</el-button>
                     <el-button id="loginCookie" @click="visible = true" class="button" title="CK登录">CK登录</el-button>
-
+                    <br/>
+                    <br/>
                     <el-button id="loginCookie" class="button" title="获取CK教程"><a
                             style="text-decoration: none;color: red" target="_blank"
-                            href="http://blog.yuannian1112.top/category/jd/">获取CK教程</a></el-button>
+                            href="http://blog.yuannian1112.top/category/jd/">手机获取CK教程</a></el-button>
+                    <el-button id="loginCookie" class="button" title="获取CK教程"><a
+                            style="text-decoration: none;color: red" target="_blank"
+                            href="https://docs.qq.com/doc/DV3RibE1vTXhUeGpz">PC获取CK教程</a></el-button>
                     <el-dialog :visible.sync="visible" title="登录" width="85%">
                         <el-radio-group v-model="radio">
                             <el-radio-button label="ck">CK登录</el-radio-button>
