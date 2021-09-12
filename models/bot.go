@@ -156,6 +156,56 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				return "导入互助码成功"
 			}
 		}
+		{
+			ss := regexp.MustCompile(`pin=([^;=\s]+);[ ]*wskey=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
+			if len(ss) > 0 {
+				for _, s := range ss {
+					if flas, str := WsKeyOK(&JdCookie{
+						Wskey: s[1] + s[2],
+						PtPin: s[1],
+					}, sender); flas {
+						wsk := regexp.MustCompile(`pin=([^;=\s]+);[ ]*wskey=([^;=\s]+)`).FindAllStringSubmatch(str, -1)
+						ck := JdCookie{
+							Wskey: s[1] + s[2],
+							PtPin: s[1],
+							PtKey: wsk[0][1],
+						}
+						if sender.IsQQ() {
+							ck.QQ = sender.UserID
+						} else if sender.IsTG() {
+							ck.Telegram = sender.UserID
+						}
+						if HasWsKey(ck.Wskey) {
+							sender.Reply(fmt.Sprintf("重复提交"))
+						} else {
+							if nck, err := GetJdCookie(ck.PtPin); err == nil {
+								nck.InPoolWsKey(ck.PtKey, ck.Wskey)
+								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+								(&JdCookie{}).Push(msg)
+								logs.Info(msg)
+							} else {
+								if Cdle {
+									ck.Hack = True
+								}
+								NewJdCookieWsKey(&ck)
+								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
+								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+								logs.Info(msg)
+							}
+							for i := range Config.Containers {
+								(&Config.Containers[i]).Write([]JdCookie{ck})
+							}
+						}
+					} else {
+						sender.Reply(fmt.Sprintf("无效账号，%s", s[1]))
+					}
+				}
+				go func() {
+					Save <- &JdCookie{}
+				}()
+				return nil
+			}
+		}
 		for k, v := range replies {
 			if regexp.MustCompile(k).FindString(msg) != "" {
 				if strings.Contains(msg, "妹") && time.Now().Unix()%10 == 0 {
@@ -182,4 +232,13 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 		}
 	}
 	return nil
+}
+
+func fetchJdCookieValue(key string, cookies string) string {
+	match := regexp.MustCompile(key + `=([^;]*);{0,1}`).FindStringSubmatch(cookies)
+	if len(match) == 2 {
+		return match[1]
+	} else {
+		return ""
+	}
 }

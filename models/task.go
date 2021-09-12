@@ -152,6 +152,13 @@ func runTask(task *Task, sender *Sender) string {
 	}()
 	msg := ""
 	reader := bufio.NewReader(stdout)
+	if task.Title == "添加wsKey" {
+		readString, err := reader.ReadString('\n')
+		if err != nil {
+			return "出现异常: " + err.Error()
+		}
+		return readString
+	}
 	st := time.Now()
 	upckMsg := ""
 	for {

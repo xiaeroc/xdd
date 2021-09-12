@@ -19,6 +19,7 @@ var ENV = "env"
 var TASK = "TASK"
 var keys map[string]bool
 var pins map[string]bool
+var wsKeys map[string]bool
 
 func initDB() {
 	var err error
@@ -69,6 +70,14 @@ func HasKey(key string) bool {
 	return false
 }
 
+func HasWsKey(key string) bool {
+	if _, ok := wsKeys[key]; ok {
+		return ok
+	}
+	wsKeys[key] = true
+	return false
+}
+
 type JdCookie struct {
 	ID           int    `gorm:"column:ID;primaryKey"`
 	Priority     int    `gorm:"column:Priority;default:1"`
@@ -107,6 +116,7 @@ type JdCookiePool struct {
 	PtPin    string `gorm:"column:PtPin"`
 	LoseAt   string `gorm:"column:LoseAt"`
 	CreateAt string `gorm:"column:CreateAt"`
+	Wskey    string `gorm:"column:Wskey"`
 }
 
 var UserLevel = "UserLevel"
@@ -207,6 +217,56 @@ func (ck *JdCookie) InPool(pt_key string) error {
 		return tx.Commit().Error
 	}
 	return nil
+}
+func (ck *JdCookie) InPoolWsKey(pt_key string, wsKey string) error {
+	if ck.ID != 0 {
+		date := Date()
+		tx := db.Begin()
+		jp := &JdCookiePool{}
+		if tx.Where(fmt.Sprintf("%s = '%s' and %s = '%s'", PtPin, ck.PtPin, PtKey, pt_key)).First(jp).Error == nil {
+			return tx.Rollback().Error
+		}
+		go test2(fmt.Sprintf("pt_key=%s;pt_pin=%s;", pt_key, ck.PtPin))
+		if err := tx.Create(&JdCookiePool{
+			PtPin:    ck.PtPin,
+			PtKey:    pt_key,
+			Wskey:    wsKey,
+			CreateAt: date,
+		}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+		tx.Model(ck).Updates(map[string]interface{}{
+			Available: True,
+			PtKey:     pt_key,
+		})
+		return tx.Commit().Error
+	}
+	return nil
+}
+func NewJdCookieWsKey(ck *JdCookie) error {
+	if ck.Hack == "" {
+		ck.Hack = False
+	}
+	ck.Priority = Config.DefaultPriority
+	date := Date()
+	ck.CreateAt = date
+	tx := db.Begin()
+	if err := tx.Create(ck).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	go test2(fmt.Sprintf("pt_key=%s;pt_pin=%s;", ck.PtKey, ck.PtPin))
+	if err := tx.Create(&JdCookiePool{
+		PtPin:    ck.PtPin,
+		PtKey:    ck.PtKey,
+		CreateAt: date,
+		Wskey:    ck.Wskey,
+	}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
 }
 
 func (ck *JdCookie) OutPool() (string, error) {

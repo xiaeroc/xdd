@@ -189,6 +189,19 @@ func CookieOK(ck *JdCookie) bool {
 	return av2(cookie)
 }
 
+func WsKeyOK(ck *JdCookie, sender *Sender) (bool, string) {
+	envs := []Env{}
+	envs = append(envs, Env{
+		Name:  "wsKey",
+		Value: ck.Wskey,
+	})
+	str := runTask(&Task{Path: "Jd_UpdateCk.py", Envs: envs, Title: "添加wsKey"}, sender)
+	if !strings.Contains(str, "pt_pin=%2A%2A%2A%2A%2A%2A;") {
+		return false, str
+	}
+	return true, str
+}
+
 func av2(cookie string) bool {
 	req := httplib.Get(`https://m.jingxi.com/user/info/GetJDUserBaseInfo?_=1629334995401&sceneval=2&g_login_type=1&g_ty=ls`)
 	req.Header("User-Agent", ua)
