@@ -160,13 +160,17 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			ss := regexp.MustCompile(`pin=([^;=\s]+);[ ]*wskey=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
 			if len(ss) > 0 {
 				for _, s := range ss {
+					if HasWsKey(msg) {
+						sender.Reply(fmt.Sprintf("重复提交"))
+						continue
+					}
 					if flas, str := WsKeyOK(&JdCookie{
-						Wskey: s[1] + s[2],
+						Wskey: s[0],
 						PtPin: s[1],
 					}, sender); flas {
-						wsk := regexp.MustCompile(`pin=([^;=\s]+);[ ]*wskey=([^;=\s]+)`).FindAllStringSubmatch(str, -1)
+						wsk := regexp.MustCompile(`pt_key=([^;=\s]+);[ ]*pt_pin=([^;=\s]+)`).FindAllStringSubmatch(str, -1)
 						ck := JdCookie{
-							Wskey: s[1] + s[2],
+							Wskey: msg,
 							PtPin: s[1],
 							PtKey: wsk[0][1],
 						}
@@ -175,26 +179,23 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 						} else if sender.IsTG() {
 							ck.Telegram = sender.UserID
 						}
-						if HasWsKey(ck.Wskey) {
-							sender.Reply(fmt.Sprintf("重复提交"))
+						if nck, err := GetJdCookie(ck.PtPin); err == nil {
+							nck.InPoolWsKey(ck.PtKey, ck.Wskey)
+							msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+							sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
+							logs.Info(msg)
 						} else {
-							if nck, err := GetJdCookie(ck.PtPin); err == nil {
-								nck.InPoolWsKey(ck.PtKey, ck.Wskey)
-								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
-								(&JdCookie{}).Push(msg)
-								logs.Info(msg)
-							} else {
-								if Cdle {
-									ck.Hack = True
-								}
-								NewJdCookieWsKey(&ck)
-								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
-								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
-								logs.Info(msg)
+							if Cdle {
+								ck.Hack = True
 							}
-							for i := range Config.Containers {
-								(&Config.Containers[i]).Write([]JdCookie{ck})
-							}
+							NewJdCookieWsKey(&ck)
+							msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
+							sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+							(&JdCookie{}).Push(msg)
+							logs.Info(msg)
+						}
+						for i := range Config.Containers {
+							(&Config.Containers[i]).Write([]JdCookie{ck})
 						}
 					} else {
 						sender.Reply(fmt.Sprintf("无效账号，%s", s[1]))

@@ -196,7 +196,7 @@ func WsKeyOK(ck *JdCookie, sender *Sender) (bool, string) {
 		Value: ck.Wskey,
 	})
 	str := runTask(&Task{Path: "Jd_UpdateCk.py", Envs: envs, Title: "添加wsKey"}, sender)
-	if !strings.Contains(str, "pt_pin=%2A%2A%2A%2A%2A%2A;") {
+	if strings.Contains(str, "pt_pin=%2A%2A%2A%2A%2A%2A;") || strings.Contains(str, "fake_") {
 		return false, str
 	}
 	return true, str
