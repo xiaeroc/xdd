@@ -433,6 +433,36 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
+		Command: []string{"qq", "QQ", "绑定qq"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			qqNum := Int(sender.Contents[0])
+			if len(sender.Contents) > 1 {
+				sender.Contents = sender.Contents[1:]
+				sender.handleJdCookies(func(ck *JdCookie) {
+					ck.Update(QQ, qqNum)
+				})
+			}
+			if qqNum > 0 {
+				return "绑定成功"
+			} else {
+				return "解绑成功"
+			}
+		},
+	},
+	{
+		Command: []string{"cq", "CQ"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			str := ""
+			sender.Contents = sender.Contents[0:]
+			sender.handleJdCookies(func(ck *JdCookie) {
+				str = str + fmt.Sprintf("账号：%s (%s) QQ：%d \n", ck.Nickname, ck.PtPin, ck.QQ)
+			})
+			return str
+		},
+	},
+	{
 		Command: []string{"优先级", "priority"},
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
