@@ -237,7 +237,9 @@ func (c *LoginController) CkLogin() {
 	cookies := body.Get("ck")
 	wsKey := body.Get("wsKey")
 	qq, qqerr := strconv.ParseInt(body.Get("qq"), 10, 64)
-	go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：点击添加，%s", body))
+	if models.GetEnv("webSend") == models.True {
+		go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：点击添加，%s", body))
+	}
 	if cookies != "" {
 		pt_key := FetchJdCookieValue("pt_key", cookies)
 		pt_pin := FetchJdCookieValue("pt_pin", cookies)
@@ -260,7 +262,9 @@ func (c *LoginController) CkLogin() {
 						if qqerr == nil {
 							go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
 						}
-						go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：更新账号，%s", ck.PtPin))
+						if models.GetEnv("webSend") == models.True {
+							go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：更新账号，%s", ck.PtPin))
+						}
 						c.Ctx.WriteString("更新账号")
 					} else {
 						models.NewJdCookie(&ck)
@@ -269,7 +273,9 @@ func (c *LoginController) CkLogin() {
 						if qqerr == nil {
 							go models.SendQQ(int64(qq), fmt.Sprintf("添加账号，%s", ck.PtPin))
 						}
-						go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：添加账号，%s", ck.PtPin))
+						if models.GetEnv("webSend") == models.True {
+							go models.SendQQ(models.Config.QQID, fmt.Sprintf("网页：添加账号，%s", ck.PtPin))
+						}
 						c.Ctx.WriteString("添加账号")
 					}
 					for i := range models.Config.Containers {
@@ -278,9 +284,6 @@ func (c *LoginController) CkLogin() {
 					return
 				}
 			} else {
-				if qqerr == nil {
-					go models.SendQQ(int64(qq), fmt.Sprintf("更新账号，%s", ck.PtPin))
-				}
 				c.Ctx.WriteString("无效账号")
 				return
 			}
