@@ -11,7 +11,7 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 )
 
-var version = "2021082007"
+var version = "2021091301"
 var describe = "日常更新"
 var AppName = "xdd"
 var pname = regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
@@ -21,7 +21,7 @@ func initVersion() {
 		version = Config.Version
 	}
 	logs.Info("检查更新" + version)
-	value, err := httplib.Get(GhProxy + "https://raw.githubusercontent.com/cdle/xdd/main/models/version.go").String()
+	value, err := httplib.Get(GhProxy + "https://raw.githubusercontent.com/xiaeroc/xdd/master/models/version.go").String()
 	if err != nil {
 		logs.Info("更新版本的失败")
 	} else {
