@@ -22,7 +22,7 @@ func init() {
 	logs.Info("当前%s", ExecPath)
 	initConfig()
 	initDB()
-	//go initVersion()
+	go initVersion()
 	//go initUserAgent()
 	initContainer()
 	initHandle()
