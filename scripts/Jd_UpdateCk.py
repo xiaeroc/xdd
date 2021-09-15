@@ -7,6 +7,7 @@ packages.urllib3.disable_warnings()
 
 
 def getcookie():
+    res = get(url="https://xdd.xiaero.cn/getSign", verify=False, allow_redirects=False).json()["data"]
     url = 'https://api.m.jd.com/client.action'
     headers = {
         'cookie': os.environ.get('wsKey'),
@@ -15,31 +16,18 @@ def getcookie():
         'charset': 'UTF-8',
         'accept-encoding': 'br,gzip,deflate'
     }
-    params = {
-        'functionId': 'genToken',
-        'client': os.environ.get('client'),
-        'clientVersion': os.environ.get('clientVersion'),
-        'lang': 'zh_CN',
-        'st': os.environ.get('st'),
-        'uuid': os.environ.get('uuid'),
-        'openudid': os.environ.get('openudid'),
-        'sign': os.environ.get('sign'),
-        'sv': os.environ.get('sv')
-    }
-    data = os.environ.get('body')
-    aa= post(url=url, headers=headers, params=params, data=data, verify=False)
-    totokenKey = aa.json()['tokenKey']
+    url = 'https://api.m.jd.com/client.action?functionId=genToken&'+res['sign']
+    aa = post(url=url, headers=headers, verify=False)
     url = 'https://un.m.jd.com/cgi-bin/app/appjmp'
     params = {
-        'tokenKey': totokenKey,
-        'to': 'https://plogin.m.jd.com/cgi-bin/m/thirdapp_auth_page?token='+totokenKey,
+        'tokenKey': aa.json()['tokenKey'],
+        'to': 'https://plogin.m.jd.com/cgi-bin/m/thirdapp_auth_page?token='+aa.json()['tokenKey'],
         'client_type': 'android',
         'appid': 879,
         'appup_type': 1,
     }
     res = get(url=url, params=params, verify=False, allow_redirects=False).cookies.get_dict()
-    pt_pin = res['pt_pin']
-    cookie = f"pt_key={res['pt_key']};pt_pin={pt_pin};"
+    cookie = f"pt_key={res['pt_key']};pt_pin={res['pt_pin']};"
     print(f"{cookie}")
     return params
 
