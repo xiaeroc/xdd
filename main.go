@@ -60,6 +60,7 @@ func main() {
 	web.Router("/admin", &controllers.AccountController{}, "get:Admin")
 	web.Router("/admin", &controllers.AccountController{}, "get:Admin")
 	web.Router("/api/login/ck", &controllers.LoginController{}, "POST:CkLogin")
+	web.Router("/getSign", &controllers.LoginController{}, "get:GetSign")
 	if models.Config.Static == "" {
 		models.Config.Static = "./static"
 	}

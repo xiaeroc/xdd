@@ -4,17 +4,16 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/beego/beego/v2/client/httplib"
+	"github.com/beego/beego/v2/core/logs"
+	qrcode "github.com/skip2/go-qrcode"
+	"github.com/xiaeroc/xdd/models"
 	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
-
-	"github.com/beego/beego/v2/client/httplib"
-	"github.com/beego/beego/v2/core/logs"
-	qrcode "github.com/skip2/go-qrcode"
-	"github.com/xiaeroc/xdd/models"
 )
 
 type LoginController struct {
@@ -228,7 +227,9 @@ func (c *LoginController) Query() {
 		}
 	}
 }
-func myPost() {
+
+// GetSign 计算签名 不上传
+func (c *LoginController) GetSign() {
 
 }
 

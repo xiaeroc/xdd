@@ -155,6 +155,7 @@ func CookieOK(ck *JdCookie) bool {
 	if err != nil {
 		return false
 	}
+
 	ui := &UserInfoResult{}
 	if nil != json.Unmarshal(data, ui) {
 		return false
