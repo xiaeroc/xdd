@@ -147,6 +147,7 @@ func CookieOK(ck *JdCookie) bool {
 	req.Header("Accept", "*/*")
 	req.Header("Accept-Language", "zh-cn,")
 	req.Header("Connection", "keep-alive,")
+	req.Header("Accept-Encoding", "gzip, deflate, br")
 	req.Header("Referer", "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&")
 	req.Header("Host", "me-api.jd.com")
 	req.Header("User-Agent", "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
@@ -154,6 +155,7 @@ func CookieOK(ck *JdCookie) bool {
 	if err != nil {
 		return false
 	}
+
 	ui := &UserInfoResult{}
 	if nil != json.Unmarshal(data, ui) {
 		return false
