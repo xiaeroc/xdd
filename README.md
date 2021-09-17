@@ -6,6 +6,8 @@
 * 发送wskey支持自动绑定，并且刷新ck
 * 绑定、解绑（qq/QQ/绑定qq QQ号 账号/1-1 ）设置0为解绑
 * 查询绑定QQ（cq 账号/1-1/QQ ）
+---
+    git clone https://ghproxy.com/https://github.com/xiaeroc/xdd.git
 
 ## 特别声明: 
 
