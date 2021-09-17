@@ -3,7 +3,9 @@ containers:
   - address:
     username:
     password:
-    weigth:  
+    client_id:
+    client_secret:
+    weigth:
     mode: parallel
     limit: 9999
 theme:
