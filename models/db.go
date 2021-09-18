@@ -131,6 +131,7 @@ var Available = "Available"
 var UnAvailable = "UnAvailable"
 var PtKey = "PtKey"
 var PtPin = "PtPin"
+var Wskey = "Wskey"
 var Priority = "Priority"
 var Nickname = "Nickname"
 var BeanNum = "BeanNum"
@@ -241,6 +242,7 @@ func (ck *JdCookie) InPoolWsKey(pt_key string, wsKey string) error {
 		tx.Model(ck).Updates(map[string]interface{}{
 			Available: True,
 			PtKey:     pt_key,
+			Wskey:     wsKeys,
 		})
 		return tx.Commit().Error
 	}
