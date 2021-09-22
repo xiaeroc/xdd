@@ -415,10 +415,12 @@ var codeSignals = []CodeSignal{
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			num := 0
+			unNum := 0
 			str := ""
 			sender.handleJdCookies(func(ck *JdCookie) {
 				if ck.Wskey == "" {
-					sender.Reply(fmt.Sprintf("账号%s(%s,QQ:%d)未配置Wskey更新ck失败。", ck.PtPin, ck.Nickname, ck.QQ))
+					unNum++
+					//sender.Reply(fmt.Sprintf("账号%s(%s,QQ:%d)未配置Wskey更新ck失败。", ck.PtPin, ck.Nickname, ck.QQ))
 				} else {
 					envs := []Env{}
 					envs = append(envs, Env{
@@ -429,7 +431,32 @@ var codeSignals = []CodeSignal{
 					str = str + runTask(&Task{Path: "Jd_UpdateCk.py", Envs: envs}, sender)
 				}
 			})
-			return fmt.Sprintf("共刷新%d账号。%s", num, str)
+			return fmt.Sprintf("共刷新%d账号 未配置wsKey账号%d。%s", num, unNum, str)
+		},
+	},
+	{
+		Command: []string{"jx", "京喜"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			pins := ""
+			if len(sender.Contents) > 1 {
+				sender.Contents = sender.Contents[1:]
+				err := sender.handleJdCookies(func(ck *JdCookie) {
+					pins += "&" + ck.PtPin
+				})
+				if err != nil {
+					return nil
+				}
+			}
+			envs := []Env{}
+			if pins != "" {
+				envs = append(envs, Env{
+					Name:  "jxPins",
+					Value: pins,
+				})
+			}
+			runTask(&Task{Path: "jx_aid_cashback.js", Envs: envs}, sender)
+			return nil
 		},
 	},
 	{

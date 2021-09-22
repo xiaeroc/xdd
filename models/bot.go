@@ -126,6 +126,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 								nck.InPool(ck.PtKey)
 								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
+								SendQQ(Config.QQID, fmt.Sprintf("添加账号，%s", ck.PtPin))
 								logs.Info(msg)
 							} else {
 								if Cdle {

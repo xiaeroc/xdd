@@ -2,7 +2,6 @@ package models
 
 import (
 	"errors"
-	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -14,7 +13,7 @@ import (
 var version = "2021091301"
 var describe = "日常更新"
 var AppName = "xdd"
-var pname = regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
+var pname = "" //regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
 
 func initVersion() {
 	if Config.Version != "" {
