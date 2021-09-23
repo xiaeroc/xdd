@@ -93,6 +93,21 @@ func (sender *Sender) handleJdCookies(handle func(ck *JdCookie)) error {
 	return nil
 }
 
+func (sender *Sender) handleTenRead(handle func(ck *TenRead)) error {
+	cks := GetTenReads()
+	a := sender.JoinContens()
+	if !sender.IsAdmin || a == "" {
+		for i := range cks {
+			if strings.Contains(sender.Type, "qq") {
+				if cks[i].QQ == sender.UserID {
+					handle(&cks[i])
+				}
+			}
+		}
+	}
+	return nil
+}
+
 var codeSignals = []CodeSignal{
 	{
 		Command: []string{"status", "状态"},
@@ -736,6 +751,25 @@ var codeSignals = []CodeSignal{
 		Handle: func(sender *Sender) interface{} {
 			sender.handleJdCookies(func(ck *JdCookie) {
 				sender.Reply(fmt.Sprintf("pt_key=%s;pt_pin=%s;", ck.PtKey, ck.PtPin))
+			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"10秒", "阅读", "yd"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleTenRead(func(ck *TenRead) {
+				envs := []Env{}
+				envs = append(envs, Env{
+					Name:  "Read10UA",
+					Value: ck.UA,
+				})
+				envs = append(envs, Env{
+					Name:  "read10sck",
+					Value: ck.CK,
+				})
+				runTask(&Task{Path: "jd_read.js", Envs: envs}, sender)
 			})
 			return nil
 		},

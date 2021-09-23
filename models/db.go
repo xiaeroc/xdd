@@ -362,3 +362,11 @@ func GetTenRead(qq string) (*TenRead, error) {
 	ck := &TenRead{}
 	return ck, db.Where(QQ+" = ?", qq).First(ck).Error
 }
+func GetTenReads(sbs ...func(sb *gorm.DB) *gorm.DB) []TenRead {
+	cks := []TenRead{}
+	tb := db
+	for _, sb := range sbs {
+		tb = sb(tb)
+	}
+	return cks
+}
