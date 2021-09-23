@@ -1,7 +1,7 @@
 /*
 10s阅读
-微信立即参与 -> http://h5.janzho7.cn/j/h?upuid=137424&ch=gzh&type=1
-备用链接 -> http://h5.cw28ciea.cn/j/h?upuid=137424&ch=gzh&type=1
+立即参与 -> http://h5.shxzzs.xyz/j/h?upuid=997294&ch=&type=1
+备用链接 -> http://h5.yutoto.xyz/j/h?upuid=997294&ch=&type=1
 每小时有0.3 一天5轮 一天1.5
 使用方法:点击开始阅读 成功阅读一次即可抓到包
 脚本没写过盾的
@@ -15,74 +15,77 @@ https://t.me/wenmou_car
 [rewrite_local]
 #10s阅读
 .*read_channel\/do_read&pageshow.* url script-request-header https://raw.githubusercontent.com/Wenmoux/scripts/wen/other/jrkuaixun.js
- 
+
 #loon
 http-request .*read_channel\/do_read&pageshow.* script-path=https://raw.githubusercontent.com/Wenmoux/scripts/wen/other/jrkuaixun.js, requires-body=true, timeout=10, tag=10s阅读
- 
+
 #surge
- 
+
 10s阅读 = type=http-request,pattern=.*read_channel\/do_read&pageshow.*,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/Wenmoux/scripts/wen/other/jrkuaixun.js,script-update-interval=0
- 
+
 [MITM]
 hostname = m.lainiwl.top
- 
+
 */
 const $ = new Env('10s阅读');
 const notify = $.isNode() ? require('./sendNotify') : '';
 const jrpush = $.isNode() ? (process.env.jrpush ? process.env.jrpush : false) :false;
-const UA = $.isNode() ? (process.env.Read10UA ? process.env.Read10UA : "Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045617 Mobile Safari/537.36 MMWEBID/5077 MicroMessenger/8.0.6.1900(0x2800063D) Process/tools WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64") : ($.getdata('Read10UA') ? JSON.parse($.getdata('Read10UA')) : "Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045617 Mobile Safari/537.36 MMWEBID/5077 MicroMessenger/8.0.6.1900(0x2800063D) Process/tools WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64")    
+const UA = $.isNode() ? (process.env.Read10UA ? process.env.Read10UA : "Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045617 Mobile Safari/537.36 MMWEBID/5077 MicroMessenger/8.0.6.1900(0x2800063D) Process/tools WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64") : ($.getdata('Read10UA') ? JSON.parse($.getdata('Read10UA')) : "Mozilla/5.0 (Linux; Android 11; Redmi K30 Build/RKQ1.200826.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/77.0.3865.120 MQQBrowser/6.2 TBS/045617 Mobile Safari/537.36 MMWEBID/5077 MicroMessenger/8.0.6.1900(0x2800063D) Process/tools WeChat/arm64 Weixin NetType/WIFI Language/zh_CN ABI/arm64")
 let host = $.getdata('read10surl')?$.getdata('read10surl'):`http://m.xhh25.top`;
-let cookiesArr = [$.getdata('read10sck')]
+let cookiesArr =process.env.read10sck ? process.env.read10sck.split("@") : [$.getdata('read10sck')]
 if ($.isNode()) {
-    cookiesArr = process.env.Readck ? process.env.Readck.split("@") : []
+    cookiesArr = process.env.read10sck ? process.env.read10sck.split("@") : []
     host = process.env.readapi ? process.env.readapi : host
 }
 message = ""
-    !(async () => {
-        if (typeof $request !== "undefined") {
-            await read10sck()
-        }
-        if (!cookiesArr[0]) {
-            $.msg($.name, '【提示】请先获取cookie', '微信打开 http://h5.hakc.top/j/r1?upuid=136678&ch=xmy', {
-                "open-url": "http://h5.hakc.top/j/r1?upuid=136678&ch=xmy"
-            });
-            return;
-        }
-        console.log(`共${cookiesArr.length}个账号`)
-        for (let k = 0; k < cookiesArr.length; k++) {
-            $.canRead = true
-            $.message = ""
-            cookie = cookiesArr[k];
-            for (let i = 0; i < 33 && $.canRead; i++) {
-                console.log(`账号【${k+1}】第${i+1}次阅读中`)
-                //   console.log(i)
-                let url = await read()
-                if (url) {
-                    if (url == "/read_channel/finish") {
-                        console.log("已达到阅读上限,下个小时再来吧")
-                        i = 9999
-                    } else {
-                        await read(url)
-                        await $.wait(1000);
-                    }
-                }
-                if ($.message.length != 0) {
-                    message += `账号【${k+1}】：${$.message} \n\n `
+!(async () => {
+    if (typeof $request !== "undefined") {
+        await read10sck()
+    }
+    if (!cookiesArr[0]) {
+        $.msg($.name, '【提示】请先获取cookie', '微信打开 http://h5.shxzzs.xyz/j/h?upuid=997294&ch=&type=1', {
+            "open-url": "http://h5.shxzzs.xyz/j/h?upuid=997294&ch=&type=1"
+        });
+        return;
+    }
+    console.log(`共${cookiesArr.length}个账号`)
+    for (let k = 0; k < cookiesArr.length; k++) {
+        $.canRead = true
+        $.message = ""
+        cookie = cookiesArr[k];
+        for (let i = 0; i < 33 && $.canRead; i++) {
+            console.log(`账号【${k+1}】第${i+1}次阅读中`)
+            //   console.log(i)
+            let url = await read()
+            if (url) {
+                if (url == "/read_channel/finish") {
+                    console.log("已达到阅读上限,下个小时再来吧")
+                    i = 9999
+                } else if (url == "/read_channel/finish?error=1&error_msg=本小时已达到阅读限制，请勿多个平台阅读，请60分钟后再来") {
+                    console.log("已达到阅读上限,下个小时再来吧")
+                    i = 9999
+                } else {
+                    await read(url)
+                    await $.wait(1000);
                 }
             }
-        }   
+            if ($.message.length != 0) {
+                message += `账号【${k+1}】：${$.message} \n\n `
+            }
+        }
+    }
+    if (message.length != 0) {
+        $.msg($.name, "", '10s阅读' + message)
+    }
+    if ($.isNode() && jrpush) {
         if (message.length != 0) {
-         $.msg($.name, "", '10s阅读' + message) 
-         }
-        if ($.isNode() && jrpush) {
-            if (message.length != 0) {
-                await notify.sendNotify("10s阅读", `${message}\n\n吹水群：https://t.me/wenmou_car`);
-            }
-        } else {
-            $.msg($.name, "", '10s阅读' + message)
+            await notify.sendNotify("10s阅读", `${message}\n\n吹水群：https://t.me/wenmou_car`);
         }
-        
-    })()
+    } else {
+        $.msg($.name, "", '10s阅读' + message)
+    }
+
+})()
     .catch((e) => $.logErr(e))
     .finally(() => $.done())
 //获取活动信息
@@ -92,9 +95,9 @@ function read10sck() {
     if ($request.url.indexOf("do_read") > -1) {
         const read10surls = $request.url
         let read10surl = read10surls.match(/(.+?)\/read_channel/)
-         $.setdata(JSON.stringify($request.headers),"read10surl")
+        $.setdata(JSON.stringify($request.headers),"read10surl")
 //        $.msg($.name, "", '10s阅读 获取数据获取成功！'+read10surl)
-          if(read10surl)     $.setdata(read10surl[1],"read10surl")
+        if(read10surl)     $.setdata(read10surl[1],"read10surl")
         if ($request.headers.Cookie) $.setdata($request.headers.Cookie, `read10sck`)
         $.log(read10sck)
         $.msg($.name, "", '10s阅读 获取数据获取成功！')
@@ -108,7 +111,7 @@ function read(url1) {
         } else {
             url = url1
         }
-      let headers = {
+        let headers = {
             cookie,
             referer:url,
             "X-Requested-With": "XMLHttpRequest",
@@ -118,7 +121,7 @@ function read(url1) {
             headers,
             url
         }
-         //  console.log(options)
+        //  console.log(options)
         $.get(options, async (err, resp, data) => {
             try {
                 if (err) {
@@ -130,16 +133,16 @@ function read(url1) {
                         console.log(data)
                         data = JSON.parse(data);
                         if (data.url) {
-                          if(!data.jkey){                  
-                            resolve(data.url)}else{
-                                    $.message = "该账号需要验证请手动阅读一次并关掉页面(不要点返回)"
-                         $.canRead = false
+                            if(!data.jkey){
+                                resolve(data.url)}else{
+                                $.message = "该账号需要验证请手动阅读一次并关掉页面(不要点返回)"
+                                $.canRead = false
                             }
                         } else {
-                       //     console.log(data.click_check)
+                            //     console.log(data.click_check)
                             if (data.click_check ) {
                                 $.message = "该账号需要验证请手动阅读一次并关掉页面(不要点返回)"
-                                  console.log($.message)
+                                console.log($.message)
                             } else {
                                 console.log(data)
                             }
