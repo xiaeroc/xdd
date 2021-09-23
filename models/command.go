@@ -757,9 +757,11 @@ var codeSignals = []CodeSignal{
 	},
 	{
 		Command: []string{"10秒", "阅读", "yd"},
-		Admin:   true,
+		Admin:   false,
 		Handle: func(sender *Sender) interface{} {
+			sender.Reply(string(sender.UserID))
 			sender.handleTenRead(func(ck *TenRead) {
+				sender.Reply(ck.SSID)
 				envs := []Env{}
 				envs = append(envs, Env{
 					Name:  "Read10UA",
@@ -771,7 +773,7 @@ var codeSignals = []CodeSignal{
 				})
 				runTask(&Task{Path: "jd_read.js", Envs: envs}, sender)
 			})
-			return nil
+			return "11111"
 		},
 	},
 }
