@@ -127,6 +127,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
 								SendQQ(Config.QQID, fmt.Sprintf("添加账号，%s", ck.PtPin))
+								(&JdCookie{}).Push(msg)
 								logs.Info(msg)
 							} else {
 								if Cdle {
@@ -135,6 +136,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 								NewJdCookie(&ck)
 								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+								(&JdCookie{}).Push(msg)
 								logs.Info(msg)
 							}
 							for i := range Config.Containers {
