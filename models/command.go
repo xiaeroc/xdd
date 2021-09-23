@@ -93,6 +93,21 @@ func (sender *Sender) handleJdCookies(handle func(ck *JdCookie)) error {
 	return nil
 }
 
+func (sender *Sender) handleTenRead(handle func(ck *TenRead)) error {
+	cks := GetTenReads()
+	a := sender.JoinContens()
+	if !sender.IsAdmin || a == "" {
+		for i := range cks {
+			if strings.Contains(sender.Type, "qq") {
+				if cks[i].QQ == sender.UserID {
+					handle(&cks[i])
+				}
+			}
+		}
+	}
+	return nil
+}
+
 var codeSignals = []CodeSignal{
 	{
 		Command: []string{"status", "状态"},
@@ -415,10 +430,12 @@ var codeSignals = []CodeSignal{
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			num := 0
+			unNum := 0
 			str := ""
 			sender.handleJdCookies(func(ck *JdCookie) {
 				if ck.Wskey == "" {
-					sender.Reply(fmt.Sprintf("账号%s(%s,QQ:%d)未配置Wskey更新ck失败。", ck.PtPin, ck.Nickname, ck.QQ))
+					unNum++
+					//sender.Reply(fmt.Sprintf("账号%s(%s,QQ:%d)未配置Wskey更新ck失败。", ck.PtPin, ck.Nickname, ck.QQ))
 				} else {
 					envs := []Env{}
 					envs = append(envs, Env{
@@ -429,7 +446,32 @@ var codeSignals = []CodeSignal{
 					str = str + runTask(&Task{Path: "Jd_UpdateCk.py", Envs: envs}, sender)
 				}
 			})
-			return fmt.Sprintf("共刷新%d账号。%s", num, str)
+			return fmt.Sprintf("共刷新%d账号 未配置wsKey账号%d。%s", num, unNum, str)
+		},
+	},
+	{
+		Command: []string{"jx", "京喜"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			pins := ""
+			if len(sender.Contents) > 1 {
+				sender.Contents = sender.Contents[1:]
+				err := sender.handleJdCookies(func(ck *JdCookie) {
+					pins += "&" + ck.PtPin
+				})
+				if err != nil {
+					return nil
+				}
+			}
+			envs := []Env{}
+			if pins != "" {
+				envs = append(envs, Env{
+					Name:  "jxPins",
+					Value: pins,
+				})
+			}
+			runTask(&Task{Path: "jx_aid_cashback.js", Envs: envs}, sender)
+			return nil
 		},
 	},
 	{
@@ -709,6 +751,25 @@ var codeSignals = []CodeSignal{
 		Handle: func(sender *Sender) interface{} {
 			sender.handleJdCookies(func(ck *JdCookie) {
 				sender.Reply(fmt.Sprintf("pt_key=%s;pt_pin=%s;", ck.PtKey, ck.PtPin))
+			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"10秒", "阅读", "yd"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.handleTenRead(func(ck *TenRead) {
+				envs := []Env{}
+				envs = append(envs, Env{
+					Name:  "Read10UA",
+					Value: ck.UA,
+				})
+				envs = append(envs, Env{
+					Name:  "read10sck",
+					Value: ck.CK,
+				})
+				runTask(&Task{Path: "jd_read.js", Envs: envs}, sender)
 			})
 			return nil
 		},

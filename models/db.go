@@ -121,6 +121,16 @@ type JdCookiePool struct {
 	Wskey    string `gorm:"column:Wskey"`
 }
 
+type TenRead struct {
+	ID       int    `gorm:"column:ID;primaryKey"`
+	QQ       int    `gorm:"column:QQ"`
+	UA       string `gorm:"column:UA"`
+	CK       string `gorm:"column:CK"`
+	CreateAt string `gorm:"column:CreateAt"`
+	Money    string `gorm:"column:Money"`
+	SSID     string `gorm:"column:SSID"`
+}
+
 var UserLevel = "UserLevel"
 var LevelName = "LevelName"
 var ScanedAt = "ScanedAt"
@@ -131,6 +141,7 @@ var Available = "Available"
 var UnAvailable = "UnAvailable"
 var PtKey = "PtKey"
 var PtPin = "PtPin"
+var Wskey = "Wskey"
 var Priority = "Priority"
 var Nickname = "Nickname"
 var BeanNum = "BeanNum"
@@ -241,6 +252,7 @@ func (ck *JdCookie) InPoolWsKey(pt_key string, wsKey string) error {
 		tx.Model(ck).Updates(map[string]interface{}{
 			Available: True,
 			PtKey:     pt_key,
+			Wskey:     wsKeys,
 		})
 		return tx.Commit().Error
 	}
@@ -335,4 +347,26 @@ func CheckIn(pin, key string) int {
 		return 1
 	}
 	return 2
+}
+func NewTenRead(ck *TenRead) error {
+	date := Date()
+	ck.CreateAt = date
+	tx := db.Begin()
+	if err := tx.Create(ck).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	return tx.Commit().Error
+}
+func GetTenRead(qq string) (*TenRead, error) {
+	ck := &TenRead{}
+	return ck, db.Where(QQ+" = ?", qq).First(ck).Error
+}
+func GetTenReads(sbs ...func(sb *gorm.DB) *gorm.DB) []TenRead {
+	cks := []TenRead{}
+	tb := db
+	for _, sb := range sbs {
+		tb = sb(tb)
+	}
+	return cks
 }
