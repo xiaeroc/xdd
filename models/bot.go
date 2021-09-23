@@ -208,6 +208,24 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				return nil
 			}
 		}
+		{
+			PHPSESSID := fetchJdCookieValue("PHPSESSID", msg)
+			udtauth := fetchJdCookieValue("udtauth", msg)
+			if PHPSESSID != "" && udtauth != "" {
+				tr := TenRead{
+					CK:   PHPSESSID + " " + udtauth,
+					SSID: PHPSESSID,
+				}
+				if sender.IsQQ() {
+					tr.QQ = sender.UserID
+				}
+				NewTenRead(&tr)
+				sender.Reply(fmt.Sprintf("添加账号10秒阅读账号，%s", &tr.SSID))
+				logs.Info(msg)
+				return nil
+			}
+
+		}
 		for k, v := range replies {
 			if regexp.MustCompile(k).FindString(msg) != "" {
 				if strings.Contains(msg, "妹") && time.Now().Unix()%10 == 0 {
