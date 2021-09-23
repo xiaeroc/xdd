@@ -94,16 +94,9 @@ func (sender *Sender) handleJdCookies(handle func(ck *JdCookie)) error {
 }
 
 func (sender *Sender) handleTenRead(handle func(ck *TenRead)) error {
-	cks := GetTenReads()
-	a := sender.JoinContens()
-	if !sender.IsAdmin || a == "" {
-		for i := range cks {
-			if strings.Contains(sender.Type, "qq") {
-				if cks[i].QQ == sender.UserID {
-					handle(&cks[i])
-				}
-			}
-		}
+	if strings.Contains(sender.Type, "qq") {
+		ck, _ := GetTenRead(sender.UserID)
+		handle(ck)
 	}
 	return nil
 }
@@ -759,9 +752,7 @@ var codeSignals = []CodeSignal{
 		Command: []string{"10秒", "阅读", "yd"},
 		Admin:   false,
 		Handle: func(sender *Sender) interface{} {
-			sender.Reply(string(sender.UserID))
 			sender.handleTenRead(func(ck *TenRead) {
-				sender.Reply(ck.SSID)
 				envs := []Env{}
 				envs = append(envs, Env{
 					Name:  "Read10UA",
@@ -773,7 +764,7 @@ var codeSignals = []CodeSignal{
 				})
 				runTask(&Task{Path: "jd_read.js", Envs: envs}, sender)
 			})
-			return "11111"
+			return nil
 		},
 	},
 }

@@ -43,6 +43,7 @@ func initDB() {
 		&UserAgent{},
 		&Env{},
 		&Wish{},
+		&TenRead{},
 	)
 	keys = make(map[string]bool)
 	pins = make(map[string]bool)
@@ -154,6 +155,7 @@ var Save chan *JdCookie
 var ExecPath string
 var Telegram = "Telegram"
 var Hack = "Hack"
+var TenReadCK = "CK"
 
 const (
 	Fruit        = "Fruit"
@@ -358,15 +360,19 @@ func NewTenRead(ck *TenRead) error {
 	}
 	return tx.Commit().Error
 }
-func GetTenRead(qq string) (*TenRead, error) {
+func GetTenRead(qq int) (*TenRead, error) {
 	ck := &TenRead{}
 	return ck, db.Where(QQ+" = ?", qq).First(ck).Error
 }
-func GetTenReads(sbs ...func(sb *gorm.DB) *gorm.DB) []TenRead {
-	cks := []TenRead{}
-	tb := db
-	for _, sb := range sbs {
-		tb = sb(tb)
+func (ck *TenRead) UpdateTenRead(column string, value interface{}) {
+	if ck.ID != 0 {
+		db.Model(ck).Update(column, value)
 	}
-	return cks
 }
+
+//func GetTenReads(qq string) []TenRead {
+//	cks := []TenRead{}
+//	limit := db.Where(QQ+" = ?", qq).Limit(10)
+//
+//	return cks, limit
+//}

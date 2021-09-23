@@ -213,13 +213,15 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			udtauth := fetchJdCookieValue("udtauth", msg)
 			if PHPSESSID != "" && udtauth != "" {
 				tr := TenRead{
-					CK:   PHPSESSID + " " + udtauth,
+					CK:   "PHPSESSID=" + PHPSESSID + "; udtauth=" + udtauth + ";",
 					SSID: PHPSESSID,
+					QQ:   sender.UserID,
 				}
-				if sender.IsQQ() {
-					tr.QQ = sender.UserID
+				if nck, err := GetTenRead(tr.QQ); err == nil {
+					nck.UpdateTenRead(TenReadCK, nck.CK+"@"+tr.CK)
+				} else {
+					NewTenRead(&tr)
 				}
-				NewTenRead(&tr)
 				sender.Reply(fmt.Sprintf("添加账号10秒阅读账号，%s", &tr.SSID))
 				logs.Info(msg)
 				return nil
