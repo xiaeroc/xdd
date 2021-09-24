@@ -64,7 +64,11 @@ message = ""
                 } else if (url == "/read_channel/finish?error=1&error_msg=本小时已达到阅读限制，请勿多个平台阅读，请60分钟后再来") {
                     console.log("已达到阅读上限,下个小时再来吧")
                     i = 9999
-                } else {
+                } else if (url.indexOf("/read_channel/finish") != -1){
+                    i = 9999
+                    console.log(url)
+                }
+                else {
                     await read(url)
                     await $.wait(1000);
                 }
