@@ -207,6 +207,14 @@ func (ck *JdCookie) Update(column string, value interface{}) {
 		db.Model(JdCookie{}).Where(PtPin+" = ?", ck.PtPin).Update(column, value)
 	}
 }
+func (ck *JdCookie) Removes(values interface{}) {
+	if ck.ID != 0 {
+		db.Model(ck).Delete(values)
+	}
+	if ck.PtPin != "" {
+		db.Model(ck).Where(PtPin+" = ?", ck.PtPin).Delete(values)
+	}
+}
 
 func (ck *JdCookie) InPool(pt_key string) error {
 	if ck.ID != 0 {
