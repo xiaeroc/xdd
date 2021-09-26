@@ -448,7 +448,7 @@ func initFarm(cookie string, state chan string) {
 		} else if a.TreeState == 1 {
 			// 预测n天后水果课可兑换功能
 			waterTotalT := (a.FarmUserPro.TreeTotalEnergy - a.FarmUserPro.TreeEnergy - a.FarmUserPro.TotalEnergy) / 10
-			floor := math.Floor(float64(waterTotalT / +0 / 5))
+			floor := math.Floor(float64(waterTotalT/40 + 0/5))
 			rt += fmt.Sprintf("种植中，进度%.2f%%🍒【预测】%.0f之后可兑换水果🍉", 100*float64(a.FarmUserPro.TreeEnergy)/float64(a.FarmUserPro.TreeTotalEnergy), floor)
 		} else if a.TreeState == 0 {
 			rt = "您忘了种植新的水果⏰"
