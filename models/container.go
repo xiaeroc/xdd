@@ -356,7 +356,7 @@ func (c *Container) read() error {
 }
 
 func (c *Container) getToken(version string) error {
-	if c.Version == "2.9" {
+	if version == "2.9" {
 		req := httplib.Get(c.Address + fmt.Sprintf("/open/auth/token?client_id=%s&client_secret=%s", c.ClientId, c.ClientSecret))
 		req.Header("Content-Type", "application/json;charset=UTF-8")
 		//req.Body(fmt.Sprintf(`{"username":"%s","password":"%s"}`, c.Username, c.Password))
@@ -461,6 +461,8 @@ func GetQlVersion(address string) (string, error) {
 	} else if strings.Contains(data, "v2.2") {
 		v = "2.2"
 	} else if strings.Contains(data, "v2.9") {
+		v = "2.9"
+	} else {
 		v = "2.9"
 	}
 	return v, nil
