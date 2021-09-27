@@ -767,6 +767,36 @@ var codeSignals = []CodeSignal{
 			return nil
 		},
 	},
+	{
+		Command: []string{"删除账号", "删除"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			sender.Reply(fmt.Sprintf("PtKey为空并且是false的账号"))
+			sender.handleJdCookies(func(ck *JdCookie) {
+				if ck.Available != True {
+					ck.Removes(ck)
+					sender.Reply(fmt.Sprintf("已清理账号%s", ck.Nickname))
+				}
+			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"delete", "dl"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			a := sender.JoinContens()
+			if a == "" {
+				sender.Reply(fmt.Sprintf("请指定要删除的账号"))
+				return nil
+			}
+			sender.handleJdCookies(func(ck *JdCookie) {
+				ck.Removes(ck)
+				sender.Reply(fmt.Sprintf("已清理账号%s", ck.Nickname))
+			})
+			return nil
+		},
+	},
 }
 
 var mx = map[int]bool{}
