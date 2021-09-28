@@ -392,7 +392,7 @@ var codeSignals = []CodeSignal{
 			if len(sender.Contents) > 1 {
 				note := sender.Contents[0]
 				sender.Contents = sender.Contents[1:]
-				str := sender.Contents[1]
+				str := sender.Contents[0]
 				number, err := strconv.Atoi(str)
 				count := 0
 				sender.handleJdCookies(func(ck *JdCookie) {
