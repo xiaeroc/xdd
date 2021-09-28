@@ -111,6 +111,7 @@ type JdCookie struct {
 	UserLevel    string `gorm:"column:UserLevel"`
 	LevelName    string `gorm:"column:LevelName"`
 	Wskey        string `gorm:"column:Wskey"`
+	Container    string `gorm:"column:Container"`
 }
 
 type JdCookiePool struct {
