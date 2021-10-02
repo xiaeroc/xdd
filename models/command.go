@@ -387,6 +387,15 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
+		Command: []string{"详细查询", "query"},
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				sender.Reply(ck.Query1())
+			})
+			return nil
+		},
+	},
+	{
 		Command: []string{"备注", "bz"},
 		Handle: func(sender *Sender) interface{} {
 			if len(sender.Contents) > 1 {
