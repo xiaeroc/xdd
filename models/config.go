@@ -26,6 +26,8 @@ type Yaml struct {
 	TelegramUserID      int    `yaml:"telegram_user_id"`
 	QQID                int64  `yaml:"qquid"`
 	QQGroupID           int64  `yaml:"qqgid"`
+	SMSAddress          string `yaml:"SMSAddress"`
+	ApiToken            string `yaml:"ApiToken"`
 	DefaultPriority     int    `yaml:"default_priority"`
 	NoGhproxy           bool   `yaml:"no_ghproxy"`
 	QbotPublicMode      bool   `yaml:"qbot_public_mode"`

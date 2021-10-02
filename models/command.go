@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"fmt"
+	"github.com/beego/beego/v2/core/logs"
 	"regexp"
 	"strconv"
 	"strings"
@@ -102,6 +103,141 @@ func (sender *Sender) handleTenRead(handle func(ck *TenRead)) error {
 }
 
 var codeSignals = []CodeSignal{
+	{
+		Command: []string{`raw ^(\d{11})$`},
+		Handle: func(s *Sender) interface{} {
+			if num := 5; len(codes) >= num {
+				return fmt.Sprintf("%v坑位全部在使用中，请排队。", num)
+			}
+			id := "qq" + strconv.Itoa(s.UserID)
+			if _, ok := codes[id]; ok {
+				return "你已在登录中。"
+			}
+			go func() {
+				c := make(chan string, 1)
+				codes = make(map[string]chan string)
+				codes[id] = c
+				defer delete(codes, id)
+				var sess = new(Session)
+				phone := s.Contents[0]
+				logs.Info(phone)
+				s.Reply("请稍后，正在模拟环境...")
+				if err := sess.Phone(phone); err != nil {
+					s.Reply(err.Error())
+					return
+				}
+				send := false
+				login := false
+				verify := false
+				success := false
+				sms_code := ""
+				for {
+					query, _ := sess.query()
+					if query.PageStatus == "SESSION_EXPIRED" {
+						s.Reply("登录超时")
+						return
+					}
+					if query.SessionTimeOut == 0 {
+						if success {
+							return
+						}
+						s.Reply("登录超时")
+						return
+					}
+					if query.CanClickLogin && !login {
+						s.Reply("正在登录...")
+						if err := sess.login(phone, sms_code); err != nil {
+							s.Reply(err.Error())
+							return
+						}
+					}
+					if query.PageStatus == "VERIFY_FAILED_MAX" {
+						s.Reply("验证码错误次数过多，请重新获取。")
+						return
+					}
+					if query.PageStatus == "VERIFY_CODE_MAX" {
+						s.Reply("对不起，短信验证码请求频繁，请稍后再试。")
+						return
+					}
+					if query.PageStatus == "REQUIRE_VERIFY" && !verify {
+						verify = true
+						s.Reply("正在自动验证...")
+						if err := sess.crackCaptcha(); err != nil {
+							s.Reply(err.Error())
+							return
+						}
+						s.Reply("验证通过。")
+						s.Reply("请输入验证码______")
+						select {
+						case sms_code = <-c:
+							s.Reply("正在提交验证码...")
+							if err := sess.SmsCode(sms_code); err != nil {
+								s.Reply(err.Error())
+								return
+							}
+							s.Reply("验证码提交成功。")
+						case <-time.After(60 * time.Second):
+							s.Reply("验证码超时。")
+							return
+
+						}
+					}
+					if query.CanSendAuth && !send {
+						if err := sess.sendAuthCode(); err != nil {
+							s.Reply(err.Error())
+							return
+						}
+						send = true
+					}
+					if !query.CanSendAuth && query.AuthCodeCountDown > 0 {
+
+					}
+					if query.AuthCodeCountDown == -1 && send {
+
+					}
+					if query.PageStatus == "SUCCESS_CK" && !success {
+						//Sender <- &Faker{
+						//	Message: fmt.Sprintf("pt_key=%v;pt_pin=%v;", query.Ck.PtKey, query.Ck.PtPin),
+						//	UserID:  s.GetUserID(),
+						//	Type:    s.GetImType(),
+						//}
+						s.Reply(fmt.Sprintf("登录成功，%v秒后可以登录下一个账号。", query.SessionTimeOut))
+						success = true
+					}
+					time.Sleep(time.Second)
+				}
+			}()
+
+			return nil
+		},
+	},
+	{
+		Command: []string{"登录"},
+		Handle: func(s *Sender) interface{} {
+			logs.Info("进入流程")
+			if num := 5; len(codes) >= num {
+				return fmt.Sprintf("%v坑位全部在使用中，请排队(稍后再试)。", num)
+			}
+			id := "qq" + strconv.Itoa(s.UserID)
+			if _, ok := codes[id]; ok {
+				return "你已在登录中。"
+			}
+			s.Reply("请输入手机号___________")
+			return nil
+		},
+	},
+	{
+		Command: []string{`raw ^(\d{6})$`},
+		Handle: func(s *Sender) interface{} {
+			if code, ok := codes["qq"+fmt.Sprint(s.UserID)]; ok {
+				//code <- s.Get()
+				logs.Info(code)
+			} else {
+				s.Reply("验证码不存在或过期了，请重新登录。")
+			}
+			return nil
+		},
+	},
 	{
 		Command: []string{"status", "状态"},
 		Admin:   true,
@@ -247,6 +383,35 @@ var codeSignals = []CodeSignal{
 			sender.handleJdCookies(func(ck *JdCookie) {
 				sender.Reply(ck.Query())
 			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"详细查询", "query"},
+		Handle: func(sender *Sender) interface{} {
+			sender.handleJdCookies(func(ck *JdCookie) {
+				sender.Reply(ck.Query1())
+			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"备注", "bz"},
+		Handle: func(sender *Sender) interface{} {
+			if len(sender.Contents) > 1 {
+				note := sender.Contents[0]
+				sender.Contents = sender.Contents[1:]
+				str := sender.Contents[0]
+				number, err := strconv.Atoi(str)
+				count := 0
+				sender.handleJdCookies(func(ck *JdCookie) {
+					count++
+					if (err == nil && number == count) || ck.PtPin == str || sender.IsAdmin {
+						ck.Update("Note", note)
+						sender.Reply(fmt.Sprintf("已设置账号%s(%s)的备注为%s。", ck.PtPin, ck.Nickname, note))
+					}
+				})
+			}
 			return nil
 		},
 	},
