@@ -213,8 +213,8 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 		}
 		{
-			PHPSESSID := fetchJdCookieValue("PHPSESSID", msg)
-			udtauth := fetchJdCookieValue("udtauth", msg)
+			PHPSESSID := FetchJdCookieValue("PHPSESSID", msg)
+			udtauth := FetchJdCookieValue("udtauth", msg)
 			if PHPSESSID != "" && udtauth != "" {
 				tr := TenRead{
 					CK:   "PHPSESSID=" + PHPSESSID + "; udtauth=" + udtauth + ";",
@@ -260,7 +260,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 	return nil
 }
 
-func fetchJdCookieValue(key string, cookies string) string {
+func FetchJdCookieValue(key string, cookies string) string {
 	match := regexp.MustCompile(key + `=([^;]*);{0,1}`).FindStringSubmatch(cookies)
 	if len(match) == 2 {
 		return match[1]

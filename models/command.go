@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/beego/beego/v2/core/logs"
+	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
@@ -381,8 +382,26 @@ var codeSignals = []CodeSignal{
 		Command: []string{"查询", "query"},
 		Handle: func(sender *Sender) interface{} {
 			sender.handleJdCookies(func(ck *JdCookie) {
-				sender.Reply(ck.Query())
+				query := ck.Query()
+				if sender.IsAdmin {
+					query = query + fmt.Sprintf("\n优先级：%v", ck.Priority)
+					query = query + fmt.Sprintf("\n绑定QQ：%v", ck.QQ)
+				}
+				sender.Reply(query)
 			})
+			return nil
+		},
+	},
+	{
+		Command: []string{"编译", "build"},
+		Handle: func(sender *Sender) interface{} {
+			sender.Reply("小滴滴正在编译程序")
+			_, err := exec.Command("sh", "-c", "cd "+ExecPath+" && go build -o "+pname).Output()
+			if err != nil {
+				return errors.New("小滴滴编译失败：" + err.Error())
+			} else {
+				sender.Reply("小滴滴编译成功")
+			}
 			return nil
 		},
 	},

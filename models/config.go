@@ -40,7 +40,9 @@ type Yaml struct {
 	NoAdmin             bool   `yaml:"no_admin"`
 	QbotConfigFile      string `yaml:"qbot_config_file"`
 	Repos               []Repo
-	HttpProxyServerPort int `yaml:"http_proxy_server_port"`
+	HttpProxyServerPort int    `yaml:"http_proxy_server_port"`
+	Wskey               bool   `yaml:"Wskey"`
+	CTime               string `yaml:"AtTime"`
 }
 
 var Balance = "balance"
