@@ -481,7 +481,7 @@ func initFarm(cookie string, state chan string) {
 			rt += "已可领取⏰"
 		} else if a.TreeState == 1 {
 			waterTotalT := (a.FarmUserPro.TreeTotalEnergy - a.FarmUserPro.TreeEnergy - a.FarmUserPro.TotalEnergy) / 10
-			rt += fmt.Sprintf("种植中，进度%.2f%%🍒【预测】%.2f天之后可兑换水果🍉", 100*float64(a.FarmUserPro.TreeEnergy)/float64(a.FarmUserPro.TreeTotalEnergy), float64(waterTotalT)/float64(waterEveryDayT))
+			rt += fmt.Sprintf("种植中，进度%.2f🍒【预测】%.2f天之后可兑换水果🍉", 100*float64(a.FarmUserPro.TreeEnergy)/float64(a.FarmUserPro.TreeTotalEnergy), float64(waterTotalT)/float64(waterEveryDayT))
 		} else if a.TreeState == 0 {
 			rt = "您忘了种植新的水果⏰"
 		}
