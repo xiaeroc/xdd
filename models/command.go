@@ -394,6 +394,7 @@ var codeSignals = []CodeSignal{
 	},
 	{
 		Command: []string{"编译", "build"},
+		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			sender.Reply("小滴滴正在编译程序")
 			_, err := exec.Command("sh", "-c", "cd "+ExecPath+" && go build -o "+pname).Output()

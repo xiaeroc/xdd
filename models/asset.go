@@ -851,7 +851,7 @@ func jxgc(cookie string, state chan string) {
 					}
 				}
 			} else {
-				msg = fmt.Sprintf(`,预计:%.2f天可兑换`, float64((production.NeedElectric-production.InvestedElectric)/(2*60*60*24)))
+				msg = msg + fmt.Sprintf(`,预计:%.2f天可兑换`, float64((production.NeedElectric-production.InvestedElectric)/(2*60*60*24)))
 			}
 			if production.Status == 3 {
 				msg = name + ",已经超时失效, 请选择新商品进行制造"
