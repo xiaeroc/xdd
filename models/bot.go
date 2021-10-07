@@ -101,6 +101,17 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				return nil
 			}
 		}
+		{
+			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)redEnvelopeId=(\S+)(&|&amp;)inviterId=(\S+)(&|&amp;)helpType=2`).FindStringSubmatch(msg)
+			if len(ss) >= 7 {
+				if sender.IsAdmin {
+					sender.Reply("极速版大赢家提现即将开始。")
+					dyjtx := Dyjtx{linkId: ss[1], redEnvelopeId: ss[3], inviter: ss[5]}
+					Dyj_tx(dyjtx, sender)
+				}
+				return nil
+			}
+		}
 		{ //
 			ss := regexp.MustCompile(`pt_key=([^;=\s]+);[ ]*pt_pin=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
 
