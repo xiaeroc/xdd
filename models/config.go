@@ -40,7 +40,9 @@ type Yaml struct {
 	NoAdmin             bool   `yaml:"no_admin"`
 	QbotConfigFile      string `yaml:"qbot_config_file"`
 	Repos               []Repo
-	HttpProxyServerPort int `yaml:"http_proxy_server_port"`
+	HttpProxyServerPort int    `yaml:"http_proxy_server_port"`
+	Wskey               bool   `yaml:"Wskey"`
+	CTime               string `yaml:"AtTime"`
 }
 
 var Balance = "balance"
@@ -55,7 +57,7 @@ func initConfig() {
 	if _, err := os.Stat(confDir); err != nil {
 		os.MkdirAll(confDir, os.ModePerm)
 	}
-	for _, name := range []string{"app.conf", "config.yaml", "reply.php"} {
+	for _, name := range []string{"app.conf", "config.yaml"} {
 		f, err := os.OpenFile(ExecPath+"/conf/"+name, os.O_RDWR|os.O_CREATE, 0777)
 		if err != nil {
 			logs.Warn(err)

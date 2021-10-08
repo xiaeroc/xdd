@@ -3,10 +3,11 @@ package models
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/beego/beego/v2/client/httplib"
+	"github.com/beego/beego/v2/core/logs"
 	"net/url"
 	"strings"
-
-	"github.com/beego/beego/v2/client/httplib"
+	"time"
 )
 
 type UserInfoResult struct {
@@ -163,7 +164,42 @@ func CookieOK(ck *JdCookie) bool {
 	switch ui.Retcode {
 	case "1001": //ck.BeanNum
 		if ui.Msg == "not login" {
-			if ck.Available == True {
+			if Config.Wskey {
+				if len(ck.Wskey) > 0 {
+					var pinky = ck.Wskey
+					msg, err := getKey(pinky)
+					if err != nil {
+						logs.Error(err)
+					}
+					//JdCookie{}.Push(fmt.Sprintf("自动转换wskey---%s", msg))
+					//缺少错误判断
+					if strings.Contains(msg, "错误") {
+						ck.Push(fmt.Sprintf("Wskey失效账号，%s", ck.PtPin))
+						(&JdCookie{}).Push(fmt.Sprintf("Wskey失效，%s", ck.PtPin))
+					} else {
+						ptKey := FetchJdCookieValue("pt_key", msg)
+						ptPin := FetchJdCookieValue("pt_pin", msg)
+						logs.Info(ptPin)
+						ck := JdCookie{
+							PtKey: ptKey,
+							PtPin: ptPin,
+						}
+						if nck, err := GetJdCookie(ptPin); err == nil {
+							nck.InPool(ck.PtKey)
+							msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+							(&JdCookie{}).Push(msg)
+							logs.Info(msg)
+						} else {
+							//nck.Update(Available, False)
+							(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", nck.PtPin))
+						}
+					}
+
+				} else {
+					ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
+					JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.Nickname))
+				}
+			} else {
 				ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
 				JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.Nickname))
 			}
@@ -219,4 +255,54 @@ func av2(cookie string) bool {
 		return true
 	}
 	return !strings.Contains(data, "login")
+}
+func updateCookie() {
+	cks := GetJdCookies()
+	l := len(cks)
+	logs.Info(l)
+	xx := 0
+	yy := 0
+	(&JdCookie{}).Push("开始定时更新转换Wskey")
+	for i := range cks {
+		if len(cks[i].Wskey) > 0 {
+			time.Sleep(10 * time.Second)
+			ck := cks[i]
+			//JdCookie{}.Push(fmt.Sprintf("更新账号账号，%s", ck.Nickname))
+			var pinky = ck.Wskey
+			rsp, err := getKey(pinky)
+			if err != nil {
+				logs.Error(err)
+			}
+			if strings.Contains(rsp, "fake") {
+				ck.Push(fmt.Sprintf("Wskey失效账号，%s", ck.PtPin))
+				(&JdCookie{}).Push(fmt.Sprintf("Wskey失效，%s", ck.PtPin))
+			} else {
+				ptKey := FetchJdCookieValue("pt_key", rsp)
+				ptPin := FetchJdCookieValue("pt_pin", rsp)
+				ck := JdCookie{
+					PtKey: ptKey,
+					PtPin: ptPin,
+				}
+				if ptPin != "" || ptKey != "" {
+					if nck, err := GetJdCookie(ck.PtPin); err == nil {
+						xx++
+						nck.InPool(ck.PtKey)
+						nck.Update(Available, True)
+						//msg := fmt.Sprintf("定时更新账号，%s", ck.PtPin)
+						////不再发送成功提醒
+						//(&JdCookie{}).Push(msg)
+						//logs.Info(msg)
+					} else {
+						yy++
+						ck.Update(Available, False)
+						(&JdCookie{}).Push(fmt.Sprintf("查无匹配得ptpin，%s", ck.PtPin))
+					}
+				}
+				go func() {
+					Save <- &JdCookie{}
+				}()
+			}
+		}
+	}
+	(&JdCookie{}).Push(fmt.Sprintf("所有CK转换完成，共%d个,转换失败个数共%d个", xx, yy))
 }

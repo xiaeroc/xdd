@@ -101,6 +101,17 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				return nil
 			}
 		}
+		{
+			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)redEnvelopeId=(\S+)(&|&amp;)inviterId=(\S+)(&|&amp;)helpType=2`).FindStringSubmatch(msg)
+			if len(ss) >= 7 {
+				if sender.IsAdmin {
+					sender.Reply("极速版大赢家提现即将开始。")
+					dyjtx := Dyjtx{linkId: ss[1], redEnvelopeId: ss[3], inviter: ss[5]}
+					Dyj_tx(dyjtx, sender)
+				}
+				return nil
+			}
+		}
 		{ //
 			ss := regexp.MustCompile(`pt_key=([^;=\s]+);[ ]*pt_pin=([^;=\s]+)`).FindAllStringSubmatch(msg, -1)
 
@@ -213,8 +224,8 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 		}
 		{
-			PHPSESSID := fetchJdCookieValue("PHPSESSID", msg)
-			udtauth := fetchJdCookieValue("udtauth", msg)
+			PHPSESSID := FetchJdCookieValue("PHPSESSID", msg)
+			udtauth := FetchJdCookieValue("udtauth", msg)
 			if PHPSESSID != "" && udtauth != "" {
 				tr := TenRead{
 					CK:   "PHPSESSID=" + PHPSESSID + "; udtauth=" + udtauth + ";",
@@ -260,7 +271,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 	return nil
 }
 
-func fetchJdCookieValue(key string, cookies string) string {
+func FetchJdCookieValue(key string, cookies string) string {
 	match := regexp.MustCompile(key + `=([^;]*);{0,1}`).FindStringSubmatch(cookies)
 	if len(match) == 2 {
 		return match[1]
