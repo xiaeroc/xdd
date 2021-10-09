@@ -839,7 +839,10 @@ func jxgc(cookie string, state chan string) {
 			xq := jxGcFuncName(cookie, fmt.Sprintf("diminfo/GetCommodityDetails?zone=dream_factory&commodityId=%d", a.Data.ProductionList[0].CommodityDimId), _stk)
 			dataInfo, _ := xq.Bytes()
 			json.Unmarshal(dataInfo, &a1)
-			name := a1.Data.CommodityList[0].Name
+			name := ""
+			if a1.Data.CommodityList != nil {
+				name = a1.Data.CommodityList[0].Name
+			}
 			msg = fmt.Sprintf(`%s ,进度: %.2f`, name, (float64(production.InvestedElectric)/float64(production.NeedElectric))*100)
 			if production.InvestedElectric >= production.NeedElectric {
 				if production.ExchangeStatus == 1 {
