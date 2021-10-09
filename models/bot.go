@@ -180,10 +180,10 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 						sender.Reply(fmt.Sprintf("重复提交"))
 						continue
 					}
-					if flas, str := WsKeyOK(&JdCookie{
+					if fleas, str := WsKeyOK2(&JdCookie{
 						Wskey: s[0],
 						PtPin: s[1],
-					}, sender); flas {
+					}); fleas {
 						wsk := regexp.MustCompile(`pt_key=([^;=\s]+);[ ]*pt_pin=([^;=\s]+)`).FindAllStringSubmatch(str, -1)
 						ck := JdCookie{
 							Wskey: msg,

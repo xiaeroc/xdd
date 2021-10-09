@@ -167,7 +167,7 @@ func CookieOK(ck *JdCookie) bool {
 			if Config.Wskey {
 				if len(ck.Wskey) > 0 {
 					var pinky = ck.Wskey
-					msg, err := getKey(pinky)
+					msg, err := GetWsKey(pinky)
 					if err != nil {
 						logs.Error(err)
 					}
@@ -239,6 +239,18 @@ func WsKeyOK(ck *JdCookie, sender *Sender) (bool, string) {
 	}
 	return true, str
 }
+func WsKeyOK2(ck *JdCookie) (bool, string) {
+	rsp, err := GetWsKey(ck.Wskey)
+	if err != nil {
+		logs.Error(err)
+		return false, rsp
+	}
+	if strings.Contains(rsp, "fake") {
+		logs.Error(err)
+		return false, rsp
+	}
+	return true, rsp
+}
 
 func av2(cookie string) bool {
 	req := httplib.Get(`https://m.jingxi.com/user/info/GetJDUserBaseInfo?_=1629334995401&sceneval=2&g_login_type=1&g_ty=ls`)
@@ -267,9 +279,7 @@ func updateCookie() {
 		if len(cks[i].Wskey) > 0 {
 			time.Sleep(10 * time.Second)
 			ck := cks[i]
-			//JdCookie{}.Push(fmt.Sprintf("更新账号账号，%s", ck.Nickname))
-			var pinky = ck.Wskey
-			rsp, err := getKey(pinky)
+			rsp, err := GetWsKey(ck.Wskey)
 			if err != nil {
 				logs.Error(err)
 			}

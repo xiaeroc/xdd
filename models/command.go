@@ -295,7 +295,7 @@ var codeSignals = []CodeSignal{
 				u.Coin += coin
 				sender.Reply(fmt.Sprintf("你是打卡第%d人，奖励%d个许愿币，许愿币余额%d。", total[0]+1, coin, u.Coin))
 				ReturnCoin(sender)
-				return ""
+				return nil
 			}
 			return nil
 		},

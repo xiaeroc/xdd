@@ -10,7 +10,7 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 )
 
-var version = "2021100301"
+var version = "2021100901"
 var describe = "日常更新"
 var AppName = "xdd"
 var pname = "" //regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
@@ -60,6 +60,7 @@ func Update(sender *Sender) error {
 		sender.Reply("小滴滴拉取代码成功")
 	}
 	sender.Reply("小滴滴正在编译程序")
+	sender.Reply(ExecPath)
 	rtn, err = exec.Command("sh", "-c", "cd "+ExecPath+" && go build -o "+pname).Output()
 	if err != nil {
 		return errors.New("小滴滴编译失败：" + err.Error())
