@@ -143,6 +143,7 @@ func CookieOK(ck *JdCookie) bool {
 	if ck == nil {
 		return true
 	}
+	logs.Info("ck----------------------ck" + cookie)
 	req := httplib.Get("https://me-api.jd.com/user_new/info/GetJDUserInfoUnion")
 	req.Header("Cookie", cookie)
 	req.Header("Accept", "*/*")
@@ -156,11 +157,14 @@ func CookieOK(ck *JdCookie) bool {
 	if err != nil {
 		return false
 	}
-
+	s, err := req.String()
+	logs.Info("req---------------------------", s)
+	logs.Info("req---------------------err-", err)
 	ui := &UserInfoResult{}
 	if nil != json.Unmarshal(data, ui) {
 		return false
 	}
+	logs.Info("ui---------------------------", ui)
 	switch ui.Retcode {
 	case "1001": //ck.BeanNum
 		if ui.Msg == "not login" {
