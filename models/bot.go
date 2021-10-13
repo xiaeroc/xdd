@@ -184,11 +184,10 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 						Wskey: s[0],
 						PtPin: s[1],
 					}); fleas {
-						wsk := regexp.MustCompile(`pt_key=([^;=\s]+);[ ]*pt_pin=([^;=\s]+)`).FindAllStringSubmatch(str, -1)
 						ck := JdCookie{
 							Wskey: msg,
-							PtPin: s[1],
-							PtKey: wsk[0][1],
+							PtPin: FetchJdCookieValue("pt_pin", str),
+							PtKey: FetchJdCookieValue("pt_key", str),
 						}
 						if sender.IsQQ() {
 							ck.QQ = sender.UserID
