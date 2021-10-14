@@ -3,7 +3,9 @@ package models
 import (
 	"errors"
 	"fmt"
+	"github.com/beego/beego/v2/client/httplib"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -306,18 +308,32 @@ var codeSignals = []CodeSignal{
 			return fmt.Sprintf("余额%d", GetCoin(sender.UserID))
 		},
 	},
+	//{
+	//	Command: []string{"qrcode", "扫码", "二维码", "scan"},
+	//	Handle: func(sender *Sender) interface{} {
+	//		//url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
+	//		//if sender.Type == "tgg" {
+	//		//	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
+	//		//}
+	//		//rsp, err := httplib.Get(url).Response()
+	//		//if err != nil {
+	//		//	return nil
+	//		//}
+	//		return "私聊发送CK给机器人即可，格式: pt_key=xxxx;pt_pin=xxxx;\n不会抓取CK请私聊群主，wsKey上车请私聊群主\n直接抓到的Ck中间有空格！！！！ 请去掉再发给机器人"
+	//	},
+	//},
 	{
 		Command: []string{"qrcode", "扫码", "二维码", "scan"},
 		Handle: func(sender *Sender) interface{} {
-			//url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
-			//if sender.Type == "tgg" {
-			//	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
-			//}
-			//rsp, err := httplib.Get(url).Response()
-			//if err != nil {
-			//	return nil
-			//}
-			return "私聊发送CK给机器人即可，格式: pt_key=xxxx;pt_pin=xxxx;\n不会抓取CK请私聊群主，wsKey上车请私聊群主\n直接抓到的Ck中间有空格！！！！ 请去掉再发给机器人"
+			url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
+			if sender.Type == "tgg" {
+				url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
+			}
+			rsp, err := httplib.Get(url).Response()
+			if err != nil {
+				return nil
+			}
+			return rsp
 		},
 	},
 	{
