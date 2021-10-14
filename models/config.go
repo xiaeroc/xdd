@@ -43,6 +43,7 @@ type Yaml struct {
 	HttpProxyServerPort int    `yaml:"http_proxy_server_port"`
 	Wskey               bool   `yaml:"Wskey"`
 	CTime               string `yaml:"AtTime"`
+	IsAddFriend         bool   `yaml:"IsAddFriend"`
 }
 
 var Balance = "balance"
