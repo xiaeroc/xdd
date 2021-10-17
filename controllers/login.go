@@ -504,6 +504,59 @@ func (c *LoginController) SMSLogin() {
 
 }
 
+func (c *LoginController) AppCkLogin() {
+	body := c.Ctx.Request.PostForm
+	cookies := body.Get("ck")
+	if models.GetEnv("webSend") == models.True {
+		go models.SendQQ(models.Config.QQID, fmt.Sprintf("APP：添加，%s", body))
+	}
+	if cookies != "" {
+		ptKey := FetchJdCookieValue("pt_key", cookies)
+		ptPin := FetchJdCookieValue("pt_pin", cookies)
+		if ptKey != "" && ptPin != "" {
+			ck := models.JdCookie{
+				PtKey: ptKey,
+				PtPin: ptPin,
+				QQ:    0,
+				Hack:  models.False,
+			}
+			if models.CookieOK(&ck) {
+				if models.HasKey(ck.PtKey) {
+					c.Ctx.WriteString("重复添加")
+					return
+				} else {
+					if nck, err := models.GetJdCookie(ck.PtPin); err == nil {
+						nck.InPool(ck.PtKey)
+						msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+						logs.Info(msg)
+						if models.GetEnv("webSend") == models.True {
+							go models.SendQQ(models.Config.QQID, fmt.Sprintf("APP：更新账号，%s", ck.PtPin))
+						}
+						c.Ctx.WriteString("更新账号")
+					} else {
+						models.NewJdCookie(&ck)
+						msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
+						logs.Info(msg)
+						if models.GetEnv("webSend") == models.True {
+							go models.SendQQ(models.Config.QQID, fmt.Sprintf("APP：添加账号，%s", ck.PtPin))
+						}
+						c.Ctx.WriteString("添加账号")
+					}
+					for i := range models.Config.Containers {
+						(&models.Config.Containers[i]).Write([]models.JdCookie{ck})
+					}
+					return
+				}
+			} else {
+				c.Ctx.WriteString("无效账号")
+				return
+			}
+		}
+	} else {
+		c.Ctx.WriteString("无效账号")
+	}
+}
+
 func (c *LoginController) Cookie() {
 	cookies := c.Ctx.Input.Header("Set-Cookie")
 	pt_key := FetchJdCookieValue("pt_key", cookies)
