@@ -63,6 +63,7 @@ func main() {
 	web.Router("/getSign", &controllers.LoginController{}, "get:GetSign")
 	web.Router("/api/login/smslogin", &controllers.LoginController{}, "post:SMSLogin")
 	web.Router("/api/appCkLogin", &controllers.LoginController{}, "put:AppCkLogin")
+	web.Router("/api/appUpdate", &controllers.LoginController{}, "get:AppUpdate")
 	if models.Config.Static == "" {
 		models.Config.Static = "./static"
 	}
