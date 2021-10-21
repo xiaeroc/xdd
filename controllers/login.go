@@ -273,7 +273,7 @@ func (c *LoginController) CkLogin() {
 						}
 						c.Ctx.WriteString("更新账号")
 					} else {
-						models.NewJdCookie(&ck)
+						models.NewJdCookie2(&ck)
 						msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 						logs.Info(msg)
 						if qqerr == nil {
@@ -303,7 +303,7 @@ func (c *LoginController) CkLogin() {
 				Wskey: wskey_str,
 				Hack:  models.True,
 			}
-			models.NewJdCookie(&ws)
+			models.NewJdCookie2(&ws)
 		}
 		c.Ctx.WriteString("暂未开放网页添加wsKey")
 		return
@@ -370,7 +370,7 @@ func CheckLogin(token, cookie, okl_token string) (string, *models.JdCookie) {
 				(&models.Config.Containers[i]).Write([]models.JdCookie{ck})
 			}
 		} else {
-			models.NewJdCookie(&ck)
+			models.NewJdCookie2(&ck)
 			msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 			(&models.JdCookie{}).Push(msg)
 			for i := range models.Config.Containers {
@@ -434,7 +434,7 @@ func (c *LoginController) SMSLogin() {
 		if ptKey != "" && ptPin != "" {
 			if models.CookieOK(ck) {
 				if !models.HasPin(ptPin) {
-					models.NewJdCookie(ck)
+					models.NewJdCookie2(ck)
 					ck.Query()
 					msg := fmt.Sprintf("来自短信的添加,账号：%s,QQ: %s", ck.PtPin, qq)
 					(&models.JdCookie{}).Push(msg)
@@ -534,7 +534,7 @@ func (c *LoginController) AppCkLogin() {
 						}
 						c.Ctx.WriteString("更新账号")
 					} else {
-						models.NewJdCookie(&ck)
+						models.NewJdCookie2(&ck)
 						msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 						logs.Info(msg)
 						if models.GetEnv("webSend") == models.True {
@@ -563,7 +563,7 @@ func (c *LoginController) Cookie() {
 	pt_pin := FetchJdCookieValue("pt_pin", cookies)
 	if pt_key != "" && pt_pin != "" {
 		if !models.HasPin(pt_pin) {
-			models.NewJdCookie(&models.JdCookie{
+			models.NewJdCookie2(&models.JdCookie{
 				PtKey: pt_key,
 				PtPin: pt_pin,
 				Hack:  models.True,
