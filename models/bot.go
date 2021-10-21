@@ -134,7 +134,11 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 							sender.Reply(fmt.Sprintf("重复提交"))
 						} else {
 							if nck, err := GetJdCookie(ck.PtPin); err == nil {
-								nck.InPool(ck.PtKey)
+								if nck.QQ == 0 {
+									nck.InPoolQQ(ck.PtKey, sender.UserID)
+								} else {
+									nck.InPool(ck.PtKey)
+								}
 								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
 								if !sender.IsAdmin {

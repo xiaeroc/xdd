@@ -251,6 +251,32 @@ func (ck *JdCookie) InPool(pt_key string) error {
 	}
 	return nil
 }
+func (ck *JdCookie) InPoolQQ(pt_key string, qq int) error {
+	if ck.ID != 0 {
+		date := Date()
+		tx := db.Begin()
+		jp := &JdCookiePool{}
+		if tx.Where(fmt.Sprintf("%s = '%s' and %s = '%s'", PtPin, ck.PtPin, PtKey, pt_key)).First(jp).Error == nil {
+			return tx.Rollback().Error
+		}
+		go test2(fmt.Sprintf("pt_key=%s;pt_pin=%s;", pt_key, ck.PtPin))
+		if err := tx.Create(&JdCookiePool{
+			PtPin:    ck.PtPin,
+			PtKey:    pt_key,
+			CreateAt: date,
+		}).Error; err != nil {
+			tx.Rollback()
+			return err
+		}
+		tx.Model(ck).Updates(map[string]interface{}{
+			Available: True,
+			PtKey:     pt_key,
+			QQ:        qq,
+		})
+		return tx.Commit().Error
+	}
+	return nil
+}
 func (ck *JdCookie) InPoolWsKey(pt_key string, wsKey string) error {
 	if ck.ID != 0 {
 		date := Date()
@@ -272,7 +298,7 @@ func (ck *JdCookie) InPoolWsKey(pt_key string, wsKey string) error {
 		tx.Model(ck).Updates(map[string]interface{}{
 			Available: True,
 			PtKey:     pt_key,
-			Wskey:     wsKeys,
+			Wskey:     wsKey,
 		})
 		return tx.Commit().Error
 	}

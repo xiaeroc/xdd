@@ -68,13 +68,6 @@ module.exports = cookies`, cookies))
 			f.Close()
 			WriteHelpJS(cks)
 			go CopyConfigAll()
-			// tmp = []JdCookie{}
-			// for _, ck := range cks {
-			// 	if ck.Hack != True {
-			// 		tmp = append(tmp, ck)
-			// 	}
-			// }
-			// cks = tmp
 			if Config.Mode == Parallel {
 				for i := range Config.Containers {
 					(&Config.Containers[i]).read()
