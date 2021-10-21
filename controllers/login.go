@@ -576,5 +576,5 @@ func (c *LoginController) Cookie() {
 }
 
 func (c *LoginController) AppUpdate() {
-	c.Ctx.WriteString("{\n\t\"isUpdate\": \"0\",\n\t\"content_url\": \"http://101.35.95.165/2.5.apk\",\n\t\"content\": \"V2.5更新\\nApp支持登录网页版京东获取自动获取CK\\n如果显示异常，请移除小组件后重新添加\",\n\t\"widgetTip\": \"V2.5更新支持登录网页版京东自动获取CK\",\n\t\"release\": \"2.5\"\n}")
+	c.Ctx.WriteString(models.GetEnv(c.GetString("app", models.GetEnv("group"))))
 }
