@@ -136,8 +136,10 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 							if nck, err := GetJdCookie(ck.PtPin); err == nil {
 								if nck.QQ == 0 {
 									nck.InPoolQQ(ck.PtKey, sender.UserID)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin, sender.UserID))
 								} else {
 									nck.InPool(ck.PtKey)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin))
 								}
 								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
@@ -168,6 +170,56 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					Save <- &JdCookie{}
 				}()
 				return nil
+			} else {
+				ptPin := FetchJdCookieValue("pt_pin", msg)
+				ptKey := FetchJdCookieValue("pt_key", msg)
+				if ptPin != "" && ptKey != "" {
+					ck := JdCookie{
+						PtKey: ptKey,
+						PtPin: ptPin,
+					}
+					if CookieOK(&ck) {
+						if sender.IsQQ() {
+							ck.QQ = sender.UserID
+						} else if sender.IsTG() {
+							ck.Telegram = sender.UserID
+						}
+						if HasKey(ck.PtKey) {
+							sender.Reply(fmt.Sprintf("重复提交"))
+						} else {
+							if nck, err := GetJdCookie(ck.PtPin); err == nil {
+								if nck.QQ == 0 {
+									nck.InPoolQQ(ck.PtKey, sender.UserID)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin, sender.UserID))
+								} else {
+									nck.InPool(ck.PtKey)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin))
+								}
+								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
+								if !sender.IsAdmin {
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
+								}
+								(&JdCookie{}).Push(msg)
+								logs.Info(msg)
+							} else {
+								if Cdle {
+									ck.Hack = True
+								}
+								NewJdCookie(&ck)
+								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
+								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+								(&JdCookie{}).Push(msg)
+								logs.Info(msg)
+							}
+							for i := range Config.Containers {
+								(&Config.Containers[i]).Write([]JdCookie{ck})
+							}
+						}
+					} else {
+						sender.Reply(fmt.Sprintf("无效账号，%s", ck.PtPin))
+					}
+				}
 			}
 		}
 		{
