@@ -153,6 +153,8 @@ func CookieOK(ck *JdCookie) bool {
 	req.Header("Host", "me-api.jd.com")
 	req.Header("User-Agent", "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
 	data, err := req.Bytes()
+	s, _ := req.String()
+	logs.Info(fmt.Sprintf("----------------- %s", s))
 	if err != nil {
 		return false
 	}
