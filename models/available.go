@@ -1,6 +1,8 @@
 package models
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"github.com/beego/beego/v2/client/httplib"
@@ -152,10 +154,14 @@ func CookieOK(ck *JdCookie) bool {
 	req.Header("Accept-Encoding", "gzip, deflate, br")
 	req.Header("Referer", "https://home.m.jd.com/myJd/newhome.action?sceneval=2&ufc=&")
 	req.Header("Host", "me-api.jd.com")
-	req.Header("User-Agent", "jdapp;iPhone;9.4.4;14.3;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1")
+	//"jdapp;iPhone;10.2.0;14.6;3cf78b0e0833c818b258b2b8604aa5708202a79f;M/5.0;network/wifi;ADID/;model/iPad8,1;addressid/1344422971;appBuild/167853;jdSupportDarkMode/0;Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1;"
+	sprintf := fmt.Sprintf("jdapp;iPhone;10.2.0;14.6;%s;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1", md5V(cookie))
+	logs.Info(fmt.Sprintf("-----User-Agent----- %s", sprintf))
+	req.Header("User-Agent", sprintf)
 	data, err := req.Bytes()
 	s, _ := req.String()
 	logs.Info(fmt.Sprintf("----------------- %s", s))
+	logs.Info(fmt.Sprintf("--------err---- %s", err))
 	if err != nil {
 		return false
 	}
@@ -319,4 +325,9 @@ func updateCookie() {
 		}
 	}
 	(&JdCookie{}).Push(fmt.Sprintf("所有CK转换完成，共%d个,转换失败个数共%d个", xx, yy))
+}
+func md5V(str string) string {
+	h := md5.New()
+	h.Write([]byte(str))
+	return hex.EncodeToString(h.Sum(nil))
 }
