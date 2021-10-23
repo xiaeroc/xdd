@@ -265,6 +265,7 @@ func av2(cookie string) bool {
 	req.Header("Referer", "https://st.jingxi.com/my/userinfo.html?&ptag=7205.12.4")
 	req.Header("Cookie", cookie)
 	data, err := req.String()
+	logs.Info(fmt.Sprintf("-----------------m.jingxi.com %s", data))
 	if err != nil {
 		return true
 	}
