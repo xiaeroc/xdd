@@ -156,7 +156,6 @@ func CookieOK(ck *JdCookie) bool {
 	req.Header("Host", "me-api.jd.com")
 	//"jdapp;iPhone;10.2.0;14.6;3cf78b0e0833c818b258b2b8604aa5708202a79f;M/5.0;network/wifi;ADID/;model/iPad8,1;addressid/1344422971;appBuild/167853;jdSupportDarkMode/0;Mozilla/5.0 (iPad; CPU OS 14_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1;"
 	sprintf := fmt.Sprintf("jdapp;iPhone;10.2.0;14.6;%s;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1", md5V(cookie))
-	logs.Info(fmt.Sprintf("-----User-Agent----- %s", sprintf))
 	req.Header("User-Agent", sprintf)
 	data, err := req.Bytes()
 	s, _ := req.String()
@@ -168,6 +167,7 @@ func CookieOK(ck *JdCookie) bool {
 	_, err = req.String()
 	ui := &UserInfoResult{}
 	if nil != json.Unmarshal(data, ui) {
+		logs.Info(fmt.Sprintf("--------err---- 11111111"))
 		return false
 	}
 	switch ui.Retcode {
