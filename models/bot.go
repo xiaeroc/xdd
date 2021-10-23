@@ -120,8 +120,9 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				xyb := 0
 				for _, s := range ss {
 					ck := JdCookie{
-						PtKey: s[1],
-						PtPin: s[2],
+						PtKey:    s[1],
+						PtPin:    s[2],
+						Priority: 2,
 					}
 					if CookieOK(&ck) {
 						xyb++
@@ -139,24 +140,15 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin, sender.UserID))
 								} else {
 									nck.InPool(ck.PtKey)
-									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin))
-								}
-								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
-								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
-								if !sender.IsAdmin {
 									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
 								}
-								(&JdCookie{}).Push(msg)
-								logs.Info(msg)
+								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
 							} else {
 								if Cdle {
 									ck.Hack = True
 								}
 								NewJdCookie(&ck)
-								msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
-								(&JdCookie{}).Push(msg)
-								logs.Info(msg)
 							}
 							for i := range Config.Containers {
 								(&Config.Containers[i]).Write([]JdCookie{ck})
@@ -175,8 +167,9 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				ptKey := FetchJdCookieValue("pt_key", msg)
 				if ptPin != "" && ptKey != "" {
 					ck := JdCookie{
-						PtKey: ptKey,
-						PtPin: ptPin,
+						PtKey:    ptKey,
+						PtPin:    ptPin,
+						Priority: 2,
 					}
 					if CookieOK(&ck) {
 						if sender.IsQQ() {

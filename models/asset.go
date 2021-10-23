@@ -96,21 +96,21 @@ func (ck *JdCookie) Query() string {
 		var rpc = make(chan []RedList)
 		var fruit = make(chan string)
 		var pet = make(chan string)
-		var gold = make(chan int64)
+		//var gold = make(chan int64)
 		var egg = make(chan int64)
-		var tyt = make(chan string)
-		var mmc = make(chan int64)
-		var zjb = make(chan int64)
-		var xgc = make(chan string)
+		//var tyt = make(chan string)
+		//var mmc = make(chan int64)
+		//var zjb = make(chan int64)
+		//var xgc = make(chan string)
 		go redPacket(cookie, rpc)
 		go initFarm(cookie, fruit)
 		go initPetTown(cookie, pet)
-		go jsGold(cookie, gold)
+		//go jsGold(cookie, gold)
 		go jxncEgg(cookie, egg)
-		go tytCoupon(cookie, tyt)
-		go mmCoin(cookie, mmc)
-		go jdzz(cookie, zjb)
-		go jxgc(cookie, xgc)
+		//go tytCoupon(cookie, tyt)
+		//go mmCoin(cookie, mmc)
+		//go jdzz(cookie, zjb)
+		//go jxgc(cookie, xgc)
 		today := time.Now().Local().Format("2006-01-02")
 		yestoday := time.Now().Local().Add(-time.Hour * 24).Format("2006-01-02")
 		page := 1
@@ -202,23 +202,23 @@ func (ck *JdCookie) Query() string {
 			msgs = append(msgs, "暂无红包数据🧧")
 		}
 		msgs = append(msgs, fmt.Sprintf("东东农场：%s", <-fruit))
-		msgs = append(msgs, fmt.Sprintf("京喜工厂：%s", <-xgc))
+		//msgs = append(msgs, fmt.Sprintf("京喜工厂：%s", <-xgc))
 		msgs = append(msgs, fmt.Sprintf("东东萌宠：%s", <-pet))
-		gn := <-gold
-		msgs = append(msgs, fmt.Sprintf("极速金币：%d(≈%.2f元)💰", gn, float64(gn)/10000))
-		zjbn := <-zjb
-		if zjbn != 0 {
-			msgs = append(msgs, fmt.Sprintf("京东赚赚：%d金币(≈%.2f元)💰", zjbn, float64(zjbn)/10000))
-		} else {
-			msgs = append(msgs, fmt.Sprintf("京东赚赚：暂无数据"))
-		}
-		mmcCoin := <-mmc
-		if mmcCoin != 0 {
-			msgs = append(msgs, fmt.Sprintf("京东秒杀：%d秒秒币(≈%.2f元)💰", mmcCoin, float64(mmcCoin)/1000))
-		} else {
-			msgs = append(msgs, fmt.Sprintf("京东秒杀：暂无数据"))
-		}
-		msgs = append(msgs, fmt.Sprintf("推一推券：%s", <-tyt))
+		//gn := <-gold
+		//msgs = append(msgs, fmt.Sprintf("极速金币：%d(≈%.2f元)💰", gn, float64(gn)/10000))
+		//zjbn := <-zjb
+		//if zjbn != 0 {
+		//	msgs = append(msgs, fmt.Sprintf("京东赚赚：%d金币(≈%.2f元)💰", zjbn, float64(zjbn)/10000))
+		//} else {
+		//	msgs = append(msgs, fmt.Sprintf("京东赚赚：暂无数据"))
+		//}
+		//mmcCoin := <-mmc
+		//if mmcCoin != 0 {
+		//	msgs = append(msgs, fmt.Sprintf("京东秒杀：%d秒秒币(≈%.2f元)💰", mmcCoin, float64(mmcCoin)/1000))
+		//} else {
+		//	msgs = append(msgs, fmt.Sprintf("京东秒杀：暂无数据"))
+		//}
+		//msgs = append(msgs, fmt.Sprintf("推一推券：%s", <-tyt))
 		msgs = append(msgs, fmt.Sprintf("惊喜牧场：%d枚鸡蛋🥚", <-egg))
 
 	} else {
