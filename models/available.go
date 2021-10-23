@@ -123,6 +123,7 @@ func initCookie() {
 	cks := GetJdCookies()
 	l := len(cks)
 	for i := 0; i < l-1; i++ {
+		time.Sleep(time.Second * 3)
 		if cks[i].Available == True && !CookieOK(&cks[i]) {
 			if pt_key, err := cks[i].OutPool(); err == nil && pt_key != "" {
 				i--
