@@ -168,7 +168,7 @@ func CookieOK(ck *JdCookie) bool {
 	ui := &UserInfoResult{}
 	if nil != json.Unmarshal(data, ui) {
 		logs.Info(fmt.Sprintf("--------err---- 11111111"))
-		return false
+		return av2(cookie)
 	}
 	switch ui.Retcode {
 	case "1001": //ck.BeanNum
