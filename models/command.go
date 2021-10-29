@@ -441,14 +441,19 @@ var codeSignals = []CodeSignal{
 	{
 		Command: []string{"查询", "query"},
 		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				query := ck.Query()
-				if sender.IsAdmin {
-					query = query + fmt.Sprintf("\n优先级：%v", ck.Priority)
-					query = query + fmt.Sprintf("\n绑定QQ：%v", ck.QQ)
-				}
-				sender.Reply(query)
-			})
+			if !sender.IsAdmin && GetEnv("query") == False {
+				str := GetEnv("queryMsg")
+				sender.Reply(str)
+			} else {
+				sender.handleJdCookies(func(ck *JdCookie) {
+					query := ck.Query()
+					if sender.IsAdmin {
+						query = query + fmt.Sprintf("\n优先级：%v", ck.Priority)
+						query = query + fmt.Sprintf("\n绑定QQ：%v", ck.QQ)
+					}
+					sender.Reply(query)
+				})
+			}
 			return nil
 		},
 	},
@@ -469,9 +474,14 @@ var codeSignals = []CodeSignal{
 	{
 		Command: []string{"详细查询", "query"},
 		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				sender.Reply(ck.Query1())
-			})
+			if !sender.IsAdmin && GetEnv("query") == False {
+				str := GetEnv("queryMsg")
+				sender.Reply(str)
+			} else {
+				sender.handleJdCookies(func(ck *JdCookie) {
+					sender.Reply(ck.Query1())
+				})
+			}
 			return nil
 		},
 	},
