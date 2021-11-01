@@ -7,7 +7,7 @@ packages.urllib3.disable_warnings()
 
 
 def getcookie():
-    res = get(url="https://xdd.xiaero.cn/getSign", verify=False, allow_redirects=False).json()["data"]
+    res = get(url="https://api.jds.codes/gentoken", verify=False, allow_redirects=False).json()["data"]
     url = 'https://api.m.jd.com/client.action'
     headers = {
         'cookie': os.environ.get('wsKey'),

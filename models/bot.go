@@ -23,13 +23,13 @@ var ListenQQPrivateMessage = func(uid int64, msg string) {
 }
 
 var ListenQQGroupMessage = func(gid int64, uid int64, msg string) {
-	if gid == Config.QQGroupID {
-		if Config.QbotPublicMode {
-			SendQQGroup(gid, uid, handleMessage(msg, "qqg", int(uid), int(gid)))
-		} else {
-			SendQQ(uid, handleMessage(msg, "qq", int(uid)))
-		}
+
+	if Config.QbotPublicMode {
+		SendQQGroup(gid, uid, handleMessage(msg, "qqg", int(uid), int(gid)))
+	} else {
+		SendQQ(uid, handleMessage(msg, "qq", int(uid)))
 	}
+
 }
 
 var replies = map[string]string{}
@@ -89,11 +89,11 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			if len(ss) > 0 {
 				if !sender.IsAdmin {
 					coin := GetCoin(sender.UserID)
-					if coin < 8 {
-						return "推一推需要8个许愿币。"
+					if coin < 88 {
+						return "推一推需要88个许愿币。"
 					}
-					RemCoin(sender.UserID, 8)
-					sender.Reply("推一推即将开始，已扣除8个许愿币。")
+					RemCoin(sender.UserID, 88)
+					sender.Reply("推一推即将开始，已扣除88个许愿币。")
 				}
 				runTask(&Task{Path: "jd_tyt.js", Envs: []Env{
 					{Name: "tytpacketId", Value: ss[1]},
@@ -120,8 +120,9 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				xyb := 0
 				for _, s := range ss {
 					ck := JdCookie{
-						PtKey: s[1],
-						PtPin: s[2],
+						PtKey:    s[1],
+						PtPin:    s[2],
+						Priority: 2,
 					}
 					if CookieOK(&ck) {
 						xyb++
@@ -134,7 +135,59 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 							sender.Reply(fmt.Sprintf("重复提交"))
 						} else {
 							if nck, err := GetJdCookie(ck.PtPin); err == nil {
-								nck.InPool(ck.PtKey)
+								if nck.QQ == 0 {
+									nck.InPoolQQ(ck.PtKey, sender.UserID)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin, sender.UserID))
+								} else {
+									nck.InPool(ck.PtKey)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s", ck.PtPin))
+								}
+								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
+							} else {
+								if Cdle {
+									ck.Hack = True
+								}
+								NewJdCookie(&ck)
+								sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+							}
+							for i := range Config.Containers {
+								(&Config.Containers[i]).Write([]JdCookie{ck})
+							}
+						}
+					} else {
+						sender.Reply(fmt.Sprintf("无效账号，%s", ck.PtPin))
+					}
+				}
+				go func() {
+					Save <- &JdCookie{}
+				}()
+				return nil
+			} else {
+				ptPin := FetchJdCookieValue("pt_pin", msg)
+				ptKey := FetchJdCookieValue("pt_key", msg)
+				if ptPin != "" && ptKey != "" {
+					ck := JdCookie{
+						PtKey:    ptKey,
+						PtPin:    ptPin,
+						Priority: 2,
+					}
+					if CookieOK(&ck) {
+						if sender.IsQQ() {
+							ck.QQ = sender.UserID
+						} else if sender.IsTG() {
+							ck.Telegram = sender.UserID
+						}
+						if HasKey(ck.PtKey) {
+							sender.Reply(fmt.Sprintf("重复提交"))
+						} else {
+							if nck, err := GetJdCookie(ck.PtPin); err == nil {
+								if nck.QQ == 0 {
+									nck.InPoolQQ(ck.PtKey, sender.UserID)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin, sender.UserID))
+								} else {
+									nck.InPool(ck.PtKey)
+									SendQQ(Config.QQID, fmt.Sprintf("更新账号，%s，%d", ck.PtPin))
+								}
 								msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
 								sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
 								if !sender.IsAdmin {
@@ -160,10 +213,6 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 						sender.Reply(fmt.Sprintf("无效账号，%s", ck.PtPin))
 					}
 				}
-				go func() {
-					Save <- &JdCookie{}
-				}()
-				return nil
 			}
 		}
 		{
@@ -180,15 +229,14 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 						sender.Reply(fmt.Sprintf("重复提交"))
 						continue
 					}
-					if flas, str := WsKeyOK(&JdCookie{
+					if fleas, str := WsKeyOK2(&JdCookie{
 						Wskey: s[0],
 						PtPin: s[1],
-					}, sender); flas {
-						wsk := regexp.MustCompile(`pt_key=([^;=\s]+);[ ]*pt_pin=([^;=\s]+)`).FindAllStringSubmatch(str, -1)
+					}); fleas {
 						ck := JdCookie{
 							Wskey: msg,
-							PtPin: s[1],
-							PtKey: wsk[0][1],
+							PtPin: FetchJdCookieValue("pt_pin", str),
+							PtKey: FetchJdCookieValue("pt_key", str),
 						}
 						if sender.IsQQ() {
 							ck.QQ = sender.UserID

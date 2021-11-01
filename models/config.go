@@ -26,6 +26,7 @@ type Yaml struct {
 	TelegramUserID      int    `yaml:"telegram_user_id"`
 	QQID                int64  `yaml:"qquid"`
 	QQGroupID           int64  `yaml:"qqgid"`
+	QQGroupIDS          string `yaml:"qqgids"`
 	SMSAddress          string `yaml:"SMSAddress"`
 	ApiToken            string `yaml:"ApiToken"`
 	DefaultPriority     int    `yaml:"default_priority"`
@@ -43,6 +44,7 @@ type Yaml struct {
 	HttpProxyServerPort int    `yaml:"http_proxy_server_port"`
 	Wskey               bool   `yaml:"Wskey"`
 	CTime               string `yaml:"AtTime"`
+	IsAddFriend         bool   `yaml:"IsAddFriend"`
 }
 
 var Balance = "balance"

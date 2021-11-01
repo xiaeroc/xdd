@@ -1,9 +1,14 @@
 package models
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/beego/beego/v2/client/httplib"
 	"github.com/beego/beego/v2/core/logs"
+	"github.com/beego/beego/v2/server/web"
+	"io/ioutil"
 	"os/exec"
 	"regexp"
 	"strconv"
@@ -28,6 +33,21 @@ type Sender struct {
 	Username          string
 	IsAdmin           bool
 	ReplySenderUserID int
+}
+
+type QQuery struct {
+	Code int `json:"code"`
+	Data struct {
+		LSid          string `json:"lSid"`
+		QqLoginQrcode struct {
+			Bytes string `json:"bytes"`
+			Sig   string `json:"sig"`
+		} `json:"qqLoginQrcode"`
+		RedirectURL string `json:"redirectUrl"`
+		State       string `json:"state"`
+		TempCookie  string `json:"tempCookie"`
+	} `json:"data"`
+	Message string `json:"message"`
 }
 
 func (sender *Sender) Reply(msg string) {
@@ -78,8 +98,8 @@ func (sender *Sender) handleJdCookies(handle func(ck *JdCookie)) error {
 			}
 		}
 		if !ok {
-			sender.Reply("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。")
-			return errors.New("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。")
+			sender.Reply("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。 请前往 https://dx.xiaero.cn/ 进行登录")
+			return errors.New("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。 请前往 https://dx.xiaero.cn/ 进行登录")
 		}
 	} else {
 		cks = LimitJdCookie(cks, a)
@@ -215,15 +235,16 @@ var codeSignals = []CodeSignal{
 	{
 		Command: []string{"登录"},
 		Handle: func(s *Sender) interface{} {
-			logs.Info("进入流程")
-			if num := 5; len(codes) >= num {
-				return fmt.Sprintf("%v坑位全部在使用中，请排队(稍后再试)。", num)
-			}
-			id := "qq" + strconv.Itoa(s.UserID)
-			if _, ok := codes[id]; ok {
-				return "你已在登录中。"
-			}
-			s.Reply("请输入手机号___________")
+			//logs.Info("进入流程")
+			//if num := 5; len(codes) >= num {
+			//	return fmt.Sprintf("%v坑位全部在使用中，请排队(稍后再试)。", num)
+			//}
+			//id := "qq" + strconv.Itoa(s.UserID)
+			//if _, ok := codes[id]; ok {
+			//	return "你已在登录中。"
+			//}
+			//s.Reply("请输入手机号___________")
+			s.Reply("请前往 https://dx.xiaero.cn/ 进行登录")
 			return nil
 		},
 	},
@@ -295,7 +316,7 @@ var codeSignals = []CodeSignal{
 				u.Coin += coin
 				sender.Reply(fmt.Sprintf("你是打卡第%d人，奖励%d个许愿币，许愿币余额%d。", total[0]+1, coin, u.Coin))
 				ReturnCoin(sender)
-				return ""
+				return nil
 			}
 			return nil
 		},
@@ -306,18 +327,57 @@ var codeSignals = []CodeSignal{
 			return fmt.Sprintf("余额%d", GetCoin(sender.UserID))
 		},
 	},
+	//{
+	//	Command: []string{"qrcode", "扫码", "二维码", "scan"},
+	//	Handle: func(sender *Sender) interface{} {
+	//		//url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
+	//		//if sender.Type == "tgg" {
+	//		//	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
+	//		//}
+	//		//rsp, err := httplib.Get(url).Response()
+	//		//if err != nil {
+	//		//	return nil
+	//		//}
+	//		return "私聊发送CK给机器人即可，格式: pt_key=xxxx;pt_pin=xxxx;\n不会抓取CK请私聊群主，wsKey上车请私聊群主\n直接抓到的Ck中间有空格！！！！ 请去掉再发给机器人"
+	//	},
+	//},
+	{
+		Command: []string{"QQ扫码", "qq扫码"},
+		Handle: func(sender *Sender) interface{} {
+			rsp, err := httplib.Post("https://api.kukuqaq.com/jd/qrcode").Response()
+			if err != nil {
+				return nil
+			}
+			body, err1 := ioutil.ReadAll(rsp.Body)
+			if err1 == nil {
+				fmt.Println(string(body))
+			}
+			s := &QQuery{}
+			if len(body) > 0 {
+				json.Unmarshal(body, &s)
+			}
+			logs.Info(s.Data.QqLoginQrcode.Bytes)
+			ddd, _ := base64.StdEncoding.DecodeString(s.Data.QqLoginQrcode.Bytes) //成图片文件并把文件写入到buffer
+			err2 := ioutil.WriteFile("./output.jpg", ddd, 0666)                   //buffer输出到jpg文件中（不做处理，直接写到文件）
+			if err2 != nil {
+				logs.Error(err2)
+			}
+			//ddd, _ := base64.StdEncoding.DecodeString("data:image/png;base64,"+s.Data.QqLoginQrcode.Bytes)
+			return "data:image/png;base64," + s.Data.QqLoginQrcode.Bytes
+		},
+	},
 	{
 		Command: []string{"qrcode", "扫码", "二维码", "scan"},
 		Handle: func(sender *Sender) interface{} {
-			//url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
-			//if sender.Type == "tgg" {
-			//	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
-			//}
-			//rsp, err := httplib.Get(url).Response()
-			//if err != nil {
-			//	return nil
-			//}
-			return "私聊发送CK给机器人即可，格式: pt_key=xxxx;pt_pin=xxxx;\n不会抓取CK请私聊群主，wsKey上车请私聊群主\n直接抓到的Ck中间有空格！！！！ 请去掉再发给机器人"
+			url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
+			if sender.Type == "tgg" {
+				url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
+			}
+			rsp, err := httplib.Get(url).Response()
+			if err != nil {
+				return nil
+			}
+			return rsp
 		},
 	},
 	{
@@ -381,14 +441,19 @@ var codeSignals = []CodeSignal{
 	{
 		Command: []string{"查询", "query"},
 		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				query := ck.Query()
-				if sender.IsAdmin {
-					query = query + fmt.Sprintf("\n优先级：%v", ck.Priority)
-					query = query + fmt.Sprintf("\n绑定QQ：%v", ck.QQ)
-				}
-				sender.Reply(query)
-			})
+			if !sender.IsAdmin && GetEnv("query") == False {
+				str := GetEnv("queryMsg")
+				sender.Reply(str)
+			} else {
+				sender.handleJdCookies(func(ck *JdCookie) {
+					query := ck.Query()
+					if sender.IsAdmin {
+						query = query + fmt.Sprintf("\n优先级：%v", ck.Priority)
+						query = query + fmt.Sprintf("\n绑定QQ：%v", ck.QQ)
+					}
+					sender.Reply(query)
+				})
+			}
 			return nil
 		},
 	},
@@ -409,9 +474,14 @@ var codeSignals = []CodeSignal{
 	{
 		Command: []string{"详细查询", "query"},
 		Handle: func(sender *Sender) interface{} {
-			sender.handleJdCookies(func(ck *JdCookie) {
-				sender.Reply(ck.Query1())
-			})
+			if !sender.IsAdmin && GetEnv("query") == False {
+				str := GetEnv("queryMsg")
+				sender.Reply(str)
+			} else {
+				sender.handleJdCookies(func(ck *JdCookie) {
+					sender.Reply(ck.Query1())
+				})
+			}
 			return nil
 		},
 	},
