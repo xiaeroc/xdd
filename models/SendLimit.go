@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"github.com/beego/beego/v2/core/logs"
 	"time"
 )
@@ -14,6 +15,7 @@ type Limit struct {
 }
 
 func getLimit(uid int, typ int) bool {
+	logs.Info(fmt.Sprintf("Config--->>Lim  %d", Config.Lim))
 	if Config.Lim == 0 {
 		return true
 	}
