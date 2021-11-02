@@ -64,6 +64,8 @@ func main() {
 	web.Router("/api/login/smslogin", &controllers.LoginController{}, "post:SMSLogin")
 	web.Router("/api/appCkLogin", &controllers.LoginController{}, "put:AppCkLogin")
 	web.Router("/api/appUpdate", &controllers.LoginController{}, "get:AppUpdate")
+	web.Router("/open/auth/token", &controllers.OtherController{}, "*:AuthToken")
+	web.Router("/open/envs", &controllers.OtherController{}, "*:Envs")
 	if models.Config.Static == "" {
 		models.Config.Static = "./static"
 	}

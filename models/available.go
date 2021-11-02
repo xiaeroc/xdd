@@ -126,7 +126,7 @@ func initCookie() {
 	l := len(cks)
 	for i := 0; i < l-1; i++ {
 		time.Sleep(time.Millisecond * 500)
-		if cks[i].Available == True && !CookieOK(&cks[i]) {
+		if cks[i].Available == True && !CookieOK2(&cks[i]) {
 			if pt_key, err := cks[i].OutPool(); err == nil && pt_key != "" {
 				i--
 			}
@@ -259,6 +259,15 @@ func WsKeyOK2(ck *JdCookie) (bool, string) {
 		return false, rsp
 	}
 	return true, rsp
+}
+func CookieOK2(ck *JdCookie) bool {
+	cookie := "pt_key=" + ck.PtKey + ";pt_pin=" + ck.PtPin + ";"
+	// fmt.Println(cookie)
+	// jdzz(cookie, make(chan int64))
+	if ck == nil {
+		return true
+	}
+	return av2(cookie)
 }
 
 func av2(cookie string) bool {
