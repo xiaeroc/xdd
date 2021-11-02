@@ -25,7 +25,7 @@ func init() {
 	go initVersion()
 	//go initUserAgent()
 	initContainer()
-	initHandle()
+	//initHandle()
 	initCron()
 	go initTgBot()
 	InitReplies()
