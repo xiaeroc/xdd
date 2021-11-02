@@ -445,7 +445,7 @@ var codeSignals = []CodeSignal{
 				str := GetEnv("queryMsg")
 				sender.Reply(str)
 			} else {
-				if getLimit(sender.UserID, 1) {
+				if sender.IsAdmin || getLimit(sender.UserID, 1) {
 					sender.handleJdCookies(func(ck *JdCookie) {
 						query := ck.Query()
 						if sender.IsAdmin {
@@ -469,7 +469,7 @@ var codeSignals = []CodeSignal{
 				str := GetEnv("queryMsg")
 				sender.Reply(str)
 			} else {
-				if getLimit(sender.UserID, 1) {
+				if sender.IsAdmin || getLimit(sender.UserID, 1) {
 					sender.handleJdCookies(func(ck *JdCookie) {
 						sender.Reply(ck.Query1())
 					})
