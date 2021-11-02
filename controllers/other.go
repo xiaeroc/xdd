@@ -19,6 +19,8 @@ func (c *OtherController) AuthToken() {
 
 func (c *OtherController) Envs() {
 	logs.Info(c.Ctx.Request.URL)
-	logs.Info(c.Ctx.Request.GetBody)
-	logs.Info(c.Ctx.Request.PostForm)
+	logs.Info(c.Ctx.Request.Body)
+	logs.Info(c.Ctx.Request.Method)
+	c.Ctx.WriteString("{\"code\":200,\"data\":{}")
+
 }
