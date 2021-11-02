@@ -45,6 +45,7 @@ func initDB() {
 		&Wish{},
 		&TenRead{},
 		&JdCookiePool2{},
+		&Limit{},
 	)
 	keys = make(map[string]bool)
 	pins = make(map[string]bool)
