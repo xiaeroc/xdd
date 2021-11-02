@@ -445,14 +445,37 @@ var codeSignals = []CodeSignal{
 				str := GetEnv("queryMsg")
 				sender.Reply(str)
 			} else {
-				sender.handleJdCookies(func(ck *JdCookie) {
-					query := ck.Query()
-					if sender.IsAdmin {
-						query = query + fmt.Sprintf("\n优先级：%v", ck.Priority)
-						query = query + fmt.Sprintf("\n绑定QQ：%v", ck.QQ)
-					}
-					sender.Reply(query)
-				})
+				if getLimit(sender.UserID, 1) {
+					sender.handleJdCookies(func(ck *JdCookie) {
+						query := ck.Query()
+						if sender.IsAdmin {
+							query = query + fmt.Sprintf("\n优先级：%v", ck.Priority)
+							query = query + fmt.Sprintf("\n绑定QQ：%v", ck.QQ)
+						}
+						sender.Reply(query)
+					})
+				} else {
+					sender.Reply(fmt.Sprintf("鉴于东哥对接口限流，为了不影响大家的任务正常运行，即日起每日限流%d次，已超过今日限制", Config.Lim))
+				}
+
+			}
+			return nil
+		},
+	},
+	{
+		Command: []string{"详细查询", "query"},
+		Handle: func(sender *Sender) interface{} {
+			if !sender.IsAdmin && GetEnv("query") == False {
+				str := GetEnv("queryMsg")
+				sender.Reply(str)
+			} else {
+				if getLimit(sender.UserID, 1) {
+					sender.handleJdCookies(func(ck *JdCookie) {
+						sender.Reply(ck.Query1())
+					})
+				} else {
+					sender.Reply(fmt.Sprintf("鉴于东哥对接口限流，为了不影响大家的任务正常运行，即日起每日限流%d次，已超过今日限制", Config.Lim))
+				}
 			}
 			return nil
 		},
@@ -467,20 +490,6 @@ var codeSignals = []CodeSignal{
 				return errors.New("小滴滴编译失败：" + err.Error())
 			} else {
 				sender.Reply("小滴滴编译成功")
-			}
-			return nil
-		},
-	},
-	{
-		Command: []string{"详细查询", "query"},
-		Handle: func(sender *Sender) interface{} {
-			if !sender.IsAdmin && GetEnv("query") == False {
-				str := GetEnv("queryMsg")
-				sender.Reply(str)
-			} else {
-				sender.handleJdCookies(func(ck *JdCookie) {
-					sender.Reply(ck.Query1())
-				})
 			}
 			return nil
 		},

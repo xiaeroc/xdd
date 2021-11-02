@@ -45,6 +45,7 @@ type Yaml struct {
 	Wskey               bool   `yaml:"Wskey"`
 	CTime               string `yaml:"AtTime"`
 	IsAddFriend         bool   `yaml:"IsAddFriend"`
+	Lim                 int    `yaml:"Lim"`
 }
 
 var Balance = "balance"
