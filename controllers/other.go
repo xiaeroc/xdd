@@ -19,8 +19,17 @@ func (c *OtherController) AuthToken() {
 
 func (c *OtherController) Envs() {
 	logs.Info(c.Ctx.Request.URL)
-	logs.Info(c.Ctx.Request.Body)
-	logs.Info(c.Ctx.Request.Method)
-	c.Ctx.WriteString("{\"code\":200,\"data\":{}")
-
+	logs.Info(c.Ctx.Request.PostForm)
+	logs.Info(c.GetString("value"))
+	logs.Info(c.GetString("name"))
+	if c.Ctx.Request.Method == "POST" {
+		body := c.Ctx.Request.PostForm
+		value := body.Get("value")
+		name := body.Get("name")
+		c.Ctx.WriteString(fmt.Sprintf("{\"code\":200,\"data\":[{\"value\":\"%s\",\"_id\":\"0\",\"created\":0,\"status\":0,\"timestamp\":\"0\",\"position\":0,\"name\":\"%s\"}]}", value, name))
+	} else if c.Ctx.Request.Method == "PUT" {
+		c.Ctx.WriteString(fmt.Sprintf("{\"code\":200,\"data\":[{\"value\":\"%s\",\"_id\":\"0\",\"created\":0,\"status\":0,\"timestamp\":\"0\",\"position\":0,\"name\":\"%s\"}]}"))
+	} else {
+		c.Ctx.WriteString("{\"code\":200,\"data\":[]}")
+	}
 }
