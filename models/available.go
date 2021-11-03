@@ -131,15 +131,22 @@ type JinXiUserInfo struct {
 
 func initCookie() {
 	cks := GetJdCookies()
-	l := len(cks)
-	for i := 0; i < l-1; i++ {
+	for i := range cks {
 		time.Sleep(time.Millisecond * 500)
 		if cks[i].Available == True && !CookieOK2(&cks[i]) {
-			if pt_key, err := cks[i].OutPool(); err == nil && pt_key != "" {
-				i--
-			}
+			logs.Info("开始禁用")
+			cks[i].OutPool()
 		}
 	}
+	//l := len(cks)
+	//for i := 0; i < l-1; i++ {
+	//
+	//	if cks[i].Available == True && !CookieOK2(&cks[i]) {
+	//		if pt_key, err := cks[i].OutPool(); err == nil && pt_key != "" {
+	//			i--
+	//		}
+	//	}
+	//}
 	go func() {
 		Save <- &JdCookie{}
 	}()
