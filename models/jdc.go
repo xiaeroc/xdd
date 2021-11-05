@@ -45,7 +45,7 @@ type VerifyCodeResponse struct {
 	} `json:"data"`
 }
 
-var JdcUrl = Config.
+var JdcUrl = Config.JDCAddress
 
 func JdcConfig() {
 	req := httplib.Get(fmt.Sprintf("%s/api/Config", JdcUrl))
