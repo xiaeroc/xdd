@@ -23,11 +23,12 @@ var ListenQQPrivateMessage = func(uid int64, msg string) {
 }
 
 var ListenQQGroupMessage = func(gid int64, uid int64, msg string) {
-
-	if Config.QbotPublicMode {
-		SendQQGroup(gid, uid, handleMessage(msg, "qqg", int(uid), int(gid)))
-	} else {
-		SendQQ(uid, handleMessage(msg, "qq", int(uid)))
+	if gid == Config.QQGroupID || strings.Contains(Config.QQGroupIDS, string(gid)) {
+		if Config.QbotPublicMode {
+			SendQQGroup(gid, uid, handleMessage(msg, "qqg", int(uid), int(gid)))
+		} else {
+			SendQQ(uid, handleMessage(msg, "qq", int(uid)))
+		}
 	}
 
 }

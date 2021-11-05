@@ -30,7 +30,7 @@ func (c *OtherController) Envs() {
 		}
 		name, nameErr := dataArr[0].(map[string]interface{})["name"].(string)
 		value, valueErr := dataArr[0].(map[string]interface{})["value"].(string)
-		remarks, _ := dataArr[0].(map[string]interface{})["value"].(string)
+		remarks, _ := dataArr[0].(map[string]interface{})["remarks"].(string)
 		if !nameErr || !valueErr {
 			c.Ctx.WriteString("{\"code\":200,\"data\":[]}")
 			return
