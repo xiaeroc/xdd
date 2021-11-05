@@ -28,6 +28,7 @@ Wskey: true  # 填空默认禁用wskey转换 需要的填true
 AtTime: 7 #填写1-12之间的数  填错自负默认为10  10点容易出现高峰超时。
 IsAddFriend: #填写true或者false  false
 Lim: 0 #每日查询限制
+JDCAddress: #JDC 地址
 tasks:
   - cron: 0 6 * * *
     path: https://raw.githubusercontent.com/cdle/xdd/main/scripts/jd_goodMorning.js

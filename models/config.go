@@ -46,6 +46,7 @@ type Yaml struct {
 	CTime               string `yaml:"AtTime"`
 	IsAddFriend         bool   `yaml:"IsAddFriend"`
 	Lim                 int    `yaml:"Lim"`
+	JDCAddress          string `yaml:"JDCAddress"`
 }
 
 var Balance = "balance"

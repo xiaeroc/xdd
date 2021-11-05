@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -85,6 +86,59 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 	}
 	switch msg {
 	default:
+		{
+			ss := regexp.MustCompile(`^(\d{11})$`).FindStringSubmatch(msg)
+			if len(ss) > 0 {
+				if num := 5; len(codes) >= num {
+					return fmt.Sprintf("%v坑位全部在使用中，请排队。", num)
+				}
+				id := "qq" + strconv.Itoa(sender.UserID)
+				if _, ok := codes[id]; ok {
+					return "你已在登录中。"
+				}
+				go func() {
+					c := make(chan string, 1)
+					codes = make(map[string]chan string)
+					codes[id] = c
+					defer delete(codes, id)
+					phone := ss[0]
+					logs.Info(phone)
+					sender.Reply("请稍后，正在模拟环境...")
+					JdcSendSMS(sender, phone)
+					sms_code := ""
+					sender.Reply("请输入验证码______")
+					select {
+					case sms_code = <-c:
+						sender.Reply("正在提交验证码...")
+						code := JdcVerifyCode(phone, sms_code)
+						if code == "" {
+							sender.Reply("登录失败...")
+						} else {
+							cookie, _ := GetJdCookie(code)
+							cookie.Update(QQ, sender.UserID)
+							sender.Reply("登录成功...")
+						}
+					case <-time.After(60 * time.Second):
+						sender.Reply("验证码超时。")
+						return
+
+					}
+					time.Sleep(time.Second)
+				}()
+			}
+
+		}
+		{
+			ss := regexp.MustCompile(`^(\d{6})$`).FindStringSubmatch(msg)
+			if len(ss) > 0 {
+				if code, ok := codes["qq"+fmt.Sprint(sender.UserID)]; ok {
+					code <- ss[0]
+					logs.Info(code)
+				} else {
+					sender.Reply("验证码不存在或过期了，请重新登录。")
+				}
+			}
+		}
 		{ //tyt
 			ss := regexp.MustCompile(`packetId=(\S+)(&|&amp;)currentActId`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
