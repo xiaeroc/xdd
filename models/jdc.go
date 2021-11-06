@@ -30,6 +30,9 @@ type SendSMSResponse struct {
 type JdcResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
+	Data    struct {
+		Status int `json:"status"`
+	} `json:"data"`
 }
 type VerifyCodeResponse struct {
 	Success bool   `json:"success"`
@@ -45,17 +48,15 @@ type VerifyCodeResponse struct {
 	} `json:"data"`
 }
 
-var JdcUrl = Config.JDCAddress
-
 func JdcConfig() {
-	req := httplib.Get(fmt.Sprintf("%s/api/Config", JdcUrl))
+	req := httplib.Get(fmt.Sprintf("%s/api/Config", Config.JDCAddress))
 	data, _ := req.String()
 	logs.Info(data)
 	//sender.Reply("获取容器NvJDC配置成功")
 }
 
 func JdcSendSMS(sender *Sender, phone string) error {
-	req := httplib.Post(fmt.Sprintf("%s/api/SendSMS", JdcUrl))
+	req := httplib.Post(fmt.Sprintf("%s/api/SendSMS", Config.JDCAddress))
 	req.Header("Content-Type", "application/json")
 	body, _ := json.Marshal(struct {
 		Phone string `json:"Phone"`
@@ -93,7 +94,7 @@ func JdcSendSMS(sender *Sender, phone string) error {
 }
 
 func JdcAutoCaptcha(sender *Sender, phone string, number int) {
-	req := httplib.Post(fmt.Sprintf("%s/api/AutoCaptcha", JdcUrl))
+	req := httplib.Post(fmt.Sprintf("%s/api/AutoCaptcha", Config.JDCAddress))
 	req.Header("Content-Type", "application/json")
 	body, _ := json.Marshal(struct {
 		Phone string `json:"Phone"`
@@ -109,8 +110,8 @@ func JdcAutoCaptcha(sender *Sender, phone string, number int) {
 	obj := JdcResponse{}
 	err = json.Unmarshal(data, &obj)
 	if err == nil {
-		if obj.Success {
-			sender.Reply("安全认证破解成功 请输入短信验证码")
+		if obj.Success || obj.Data.Status != 666 {
+			sender.Reply("安全认证破解成功 请输入验证码______")
 		} else if !obj.Success && number <= 5 {
 			logs.Info("验证失败")
 			time.Sleep(time.Millisecond * 1000)
@@ -122,7 +123,7 @@ func JdcAutoCaptcha(sender *Sender, phone string, number int) {
 }
 
 func JdcVerifyCode(phone string, code string) string {
-	req := httplib.Post(fmt.Sprintf("%s/api/VerifyCode", JdcUrl))
+	req := httplib.Post(fmt.Sprintf("%s/api/VerifyCode", Config.JDCAddress))
 	req.Header("Content-Type", "application/json")
 	body, _ := json.Marshal(struct {
 		Phone string `json:"Phone"`

@@ -24,7 +24,7 @@ var ListenQQPrivateMessage = func(uid int64, msg string) {
 }
 
 var ListenQQGroupMessage = func(gid int64, uid int64, msg string) {
-	if gid == Config.QQGroupID || strings.Contains(Config.QQGroupIDS, string(gid)) {
+	if gid == Config.QQGroupID || strings.Contains(Config.QQGroupIDS, fmt.Sprintf("%d", gid)) {
 		if Config.QbotPublicMode {
 			SendQQGroup(gid, uid, handleMessage(msg, "qqg", int(uid), int(gid)))
 		} else {
@@ -106,7 +106,6 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					sender.Reply("请稍后，正在模拟环境...")
 					JdcSendSMS(sender, phone)
 					sms_code := ""
-					sender.Reply("请输入验证码______")
 					select {
 					case sms_code = <-c:
 						sender.Reply("正在提交验证码...")
