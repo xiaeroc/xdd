@@ -24,6 +24,9 @@ var ListenQQPrivateMessage = func(uid int64, msg string) {
 }
 
 var ListenQQGroupMessage = func(gid int64, uid int64, msg string) {
+	logs.Info(Config.QQGroupIDS)
+	logs.Info(gid)
+	logs.Info(strings.Contains(Config.QQGroupIDS, fmt.Sprintf("%d", gid)))
 	if gid == Config.QQGroupID || strings.Contains(Config.QQGroupIDS, fmt.Sprintf("%d", gid)) {
 		if Config.QbotPublicMode {
 			SendQQGroup(gid, uid, handleMessage(msg, "qqg", int(uid), int(gid)))
@@ -89,6 +92,9 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 		{
 			ss := regexp.MustCompile(`^(\d{11})$`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
+				if Config.JDCAddress == "" {
+					return "未配置JDC"
+				}
 				if num := 5; len(codes) >= num {
 					return fmt.Sprintf("%v坑位全部在使用中，请排队。", num)
 				}
@@ -130,6 +136,8 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 		{
 			ss := regexp.MustCompile(`^(\d{6})$`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
+				if Config.JDCAddress == "" {
+				}
 				if code, ok := codes["qq"+fmt.Sprint(sender.UserID)]; ok {
 					code <- ss[0]
 					logs.Info(code)
