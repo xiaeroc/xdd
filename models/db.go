@@ -54,7 +54,7 @@ func initDB() {
 	db.Find(&jps)
 	for _, jp := range jps {
 		keys[jp.PtKey] = true
-		pins[jp.Wskey] = true
+		wsKeys[jp.Wskey] = true
 		pins[jp.PtPin] = true
 	}
 }

@@ -122,17 +122,19 @@ func JdcAutoCaptcha(sender *Sender, phone string, number int) {
 	}
 }
 
-func JdcVerifyCode(phone string, code string) string {
+func JdcVerifyCode(phone string, code string, qq string) string {
 	req := httplib.Post(fmt.Sprintf("%s/api/VerifyCode", Config.JDCAddress))
 	req.Header("Content-Type", "application/json")
 	body, _ := json.Marshal(struct {
 		Phone string `json:"Phone"`
 		Qlkey int    `json:"qlkey"`
 		Code  string `json:"Code"`
+		QQ    string `json:"QQ"`
 	}{
 		Phone: phone,
-		Qlkey: 1,
+		Qlkey: 0,
 		Code:  code,
+		QQ:    qq,
 	})
 	req.Body(body)
 	rsp, err := req.Response()

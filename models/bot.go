@@ -115,7 +115,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					select {
 					case sms_code = <-c:
 						sender.Reply("正在提交验证码...")
-						code := JdcVerifyCode(phone, sms_code)
+						code := JdcVerifyCode(phone, sms_code, string(sender.UserID))
 						if code == "" {
 							sender.Reply("登录失败...")
 						} else {

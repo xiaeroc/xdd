@@ -415,11 +415,11 @@ func (c *LoginController) SMSLogin() {
 	token := c.GetString("token")
 	cookie := c.GetString("ck")
 	qq := c.GetString("qq")
-	logs.Info(cookie)
-	(&models.JdCookie{}).Push(cookie)
-
+	logs.Info("短信提交 CK:" + cookie + " QQ:" + qq)
+	if models.GetEnv("webSend") == models.True {
+		(&models.JdCookie{}).Push("短信提交 CK:" + cookie + " QQ:" + qq)
+	}
 	if token == models.Config.ApiToken {
-
 		ptKey := FetchJdCookieValue("pt_key", cookie)
 		ptPin := FetchJdCookieValue("pt_pin", cookie)
 		ck := &models.JdCookie{
@@ -432,22 +432,48 @@ func (c *LoginController) SMSLogin() {
 			ck.QQ, _ = strconv.Atoi(qq)
 		}
 		if ptKey != "" && ptPin != "" {
-			if models.CookieOK(ck) {
-				if !models.HasPin(ptPin) {
-					models.NewJdCookie2(ck)
-					ck.Query()
-					msg := fmt.Sprintf("来自短信的添加,账号：%s,QQ: %s", ck.PtPin, qq)
-					(&models.JdCookie{}).Push(msg)
-				} else if !models.HasKey(ptKey) {
-					ck, _ := models.GetJdCookie(ptPin)
-					ck.InPool(ptKey)
-					if qq != "" {
-						ck.Update(models.QQ, qq)
+			if models.CookieOK2(ck) {
+				if !models.HasKey(ck.PtKey) {
+					if nck, err := models.GetJdCookie(ck.PtPin); err == nil {
+						nck.InPool(ck.PtKey)
+						msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+						sprintf := fmt.Sprintf("短信：更新账号，%s", ck.PtPin)
+						logs.Info(msg)
+						if qq != "" {
+							sprintf = fmt.Sprintf("%s QQ：%s", sprintf, qq)
+							ck.Update(models.QQ, qq)
+						}
+						if models.GetEnv("webSend") == models.True {
+							go models.SendQQ(models.Config.QQID, sprintf)
+						}
+						(&models.JdCookie{}).Push(msg)
+					} else {
+						models.NewJdCookie2(ck)
+						msg := fmt.Sprintf("添加账号，%s", ck.PtPin)
+						sprintf := fmt.Sprintf("短信：添加账号，%s", ck.PtPin)
+						if qq != "" {
+							sprintf = fmt.Sprintf("%s QQ：%s", sprintf, qq)
+						}
+						if models.GetEnv("webSend") == models.True {
+							go models.SendQQ(models.Config.QQID, sprintf)
+						}
+						(&models.JdCookie{}).Push(msg)
 					}
-					msg := fmt.Sprintf("来自短信的更新,账号：%s", ck.PtPin)
-					(&models.JdCookie{}).Push(msg)
 				}
-
+				//if nck, err := models.GetJdCookie(ck.PtPin); err == nil {
+				//	models.NewJdCookie2(ck)
+				//	ck.Query()
+				//	msg := fmt.Sprintf("来自短信的添加,账号：%s,QQ: %s", ck.PtPin, qq)
+				//	(&models.JdCookie{}).Push(msg)
+				//} else if !models.HasKey(ptKey) {
+				//	ck, _ := models.GetJdCookie(ptPin)
+				//	ck.InPool(ptKey)
+				//	if qq != "" {
+				//		ck.Update(models.QQ, qq)
+				//	}
+				//	msg := fmt.Sprintf("来自短信的更新,账号：%s", ck.PtPin)
+				//	(&models.JdCookie{}).Push(msg)
+				//}
 				result := Result{
 					Data:    "null",
 					Code:    200,
