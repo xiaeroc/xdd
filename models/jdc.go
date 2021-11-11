@@ -94,6 +94,7 @@ func JdcSendSMS(sender *Sender, phone string) error {
 }
 
 func JdcAutoCaptcha(sender *Sender, phone string, number int) {
+	sender.Reply(fmt.Sprintf("第%d次,尝试中******", number))
 	req := httplib.Post(fmt.Sprintf("%s/api/AutoCaptcha", Config.JDCAddress))
 	req.Header("Content-Type", "application/json")
 	body, _ := json.Marshal(struct {
@@ -117,7 +118,7 @@ func JdcAutoCaptcha(sender *Sender, phone string, number int) {
 			time.Sleep(time.Millisecond * 1000)
 			JdcAutoCaptcha(sender, phone, number+1)
 		} else {
-			sender.Reply("安全认证破解失败，请联系管理员")
+			sender.Reply("安全认证破解失败，请联系管理员或者前往网页手动滑块")
 		}
 	}
 }
