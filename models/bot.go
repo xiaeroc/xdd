@@ -116,13 +116,12 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					case sms_code = <-c:
 						sender.Reply("正在提交验证码...")
 						code := JdcVerifyCode(phone, sms_code, fmt.Sprintf("%d", sender.UserID))
-						if !code {
-							sender.Reply("登录失败...")
-						} else {
-							//
+						if code {
 							//cookie, _ := GetJdCookie(code)
 							//cookie.Update(QQ, sender.UserID)
 							sender.Reply("登录成功...")
+						} else {
+							sender.Reply("登录失败...")
 						}
 					case <-time.After(60 * time.Second):
 						sender.Reply("验证码超时。")
