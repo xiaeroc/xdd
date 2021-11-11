@@ -7,6 +7,8 @@
 * 绑定、解绑（qq/QQ/绑定qq QQ号 账号/1-1 ）设置0为解绑
 * 查询绑定QQ（cq 账号/1-1/QQ ）
 * upck 账号/1-1/QQ wskey更新ck
+* 删除账号指定账号 delete/dl 账号/1-1/QQ
+* 删除账号过期账号 删除账号/删除
 --- 
 更新说明
 * 青龙2.9新增配置文件值 client_id client_secret
