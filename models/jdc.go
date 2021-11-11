@@ -122,7 +122,7 @@ func JdcAutoCaptcha(sender *Sender, phone string, number int) {
 	}
 }
 
-func JdcVerifyCode(phone string, code string, qq string) string {
+func JdcVerifyCode(phone string, code string, qq string) bool {
 	req := httplib.Post(fmt.Sprintf("%s/api/VerifyCode", Config.JDCAddress))
 	req.Header("Content-Type", "application/json")
 	body, _ := json.Marshal(struct {
@@ -142,14 +142,11 @@ func JdcVerifyCode(phone string, code string, qq string) string {
 	obj := VerifyCodeResponse{}
 	err = json.Unmarshal(data, &obj)
 	if err == nil {
-		logs.Info(obj.Data)
-		logs.Info(obj.Message)
 		if obj.Success {
-			logs.Info("登录成功")
-			return obj.Data.Nickname
+			logs.Info(obj.Message)
 		}
 	}
-	return ""
+	return obj.Success
 }
 func GetInput() string {
 	//使用os.Stdin开启输入流
