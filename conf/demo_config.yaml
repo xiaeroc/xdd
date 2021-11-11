@@ -29,6 +29,7 @@ AtTime: 7 #填写1-12之间的数  填错自负默认为10  10点容易出现高
 IsAddFriend: #填写true或者false  false
 Lim: 0 #每日查询限制
 JDCAddress: #JDC 地址
+ApiToken: aaaaaa # xdd api token
 tasks:
   - cron: 0 6 * * *
     path: https://raw.githubusercontent.com/cdle/xdd/main/scripts/jd_goodMorning.js
