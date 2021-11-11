@@ -364,7 +364,7 @@ var codeSignals = []CodeSignal{
 			//	return "你已在登录中。"
 			//}
 			//s.Reply("请输入手机号___________")
-			s.Reply("请前往 https://dx.xiaero.cn/ 进行登录")
+			s.Reply("请前往 网页进行登录")
 			return nil
 		},
 	},
