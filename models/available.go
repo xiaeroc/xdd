@@ -327,7 +327,52 @@ func CookieOK2(ck *JdCookie) bool {
 	if ck == nil {
 		return true
 	}
-	return av2(cookie)
+	b2 := av2(cookie)
+	if b2 == false {
+		if Config.Wskey {
+			if len(ck.Wskey) > 0 {
+				var pinky = ck.Wskey
+				msg, err := GetWsKey(pinky)
+				if err != nil {
+					logs.Error(err)
+				}
+				//JdCookie{}.Push(fmt.Sprintf("自动转换wskey---%s", msg))
+				//缺少错误判断
+				if strings.Contains(msg, "错误") {
+					ck.Push(fmt.Sprintf("Wskey失效账号，%s", ck.PtPin))
+					(&JdCookie{}).Push(fmt.Sprintf("Wskey失效，%s", ck.PtPin))
+				} else {
+					ptKey := FetchJdCookieValue("pt_key", msg)
+					ptPin := FetchJdCookieValue("pt_pin", msg)
+					logs.Info(ptPin)
+					ck := JdCookie{
+						PtKey: ptKey,
+						PtPin: ptPin,
+					}
+					if nck, err := GetJdCookie(ptPin); err == nil {
+						nck.InPool(ck.PtKey)
+						msg := fmt.Sprintf("更新账号，%s", ck.PtPin)
+						(&JdCookie{}).Push(msg)
+						logs.Info(msg)
+					} else {
+						//nck.Update(Available, False)
+						(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", nck.PtPin))
+					}
+				}
+
+			} else {
+				ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
+				JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
+			}
+		} else {
+			ck.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
+			JdCookie{}.Push(fmt.Sprintf("失效账号，%s", ck.PtPin))
+		}
+		return false
+	} else {
+		return true
+	}
+	//return av2(cookie)
 }
 
 func av2(cookie string) bool {
