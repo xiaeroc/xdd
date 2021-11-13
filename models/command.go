@@ -353,18 +353,9 @@ var codeSignals = []CodeSignal{
 	//	},
 	//},
 	{
-		Command: []string{"登录"},
+		Command: []string{"登录", "短信登录", "账号登录"},
 		Handle: func(s *Sender) interface{} {
-			//logs.Info("进入流程")
-			//if num := 5; len(codes) >= num {
-			//	return fmt.Sprintf("%v坑位全部在使用中，请排队(稍后再试)。", num)
-			//}
-			//id := "qq" + strconv.Itoa(s.UserID)
-			//if _, ok := codes[id]; ok {
-			//	return "你已在登录中。"
-			//}
-			//s.Reply("请输入手机号___________")
-			s.Reply("请前往 网页进行登录")
+			s.Reply(fmt.Sprintf("请输入手机号___________ 或者前往 %s 进行登录", Config.JDCAddress))
 			return nil
 		},
 	},
