@@ -164,7 +164,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 		}
 		{ //挖宝
-			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)inviterId=(\S+)(&|&amp;)inviterCode=(\S+)(&|&amp;)utm_user`).FindStringSubmatch(msg)
+			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)inviterId=(\S+)(&|&amp;)inviterCode=(\w+)(&|&amp;)`).FindStringSubmatch(msg)
 			if len(ss) > 6 {
 				if !sender.IsAdmin {
 					coin := GetCoin(sender.UserID)
@@ -174,9 +174,16 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					RemCoin(sender.UserID, 188)
 					sender.Reply("发财挖宝即将开始，已扣除88个许愿币。")
 				}
-
+				wbHelp := GetEnv("wbHelp")
+				if wbHelp == "" {
+					wbHelp = "0"
+				}
+				wbHelpMax := GetEnv("wbHelpMax")
+				if wbHelp == "" {
+					wbHelpMax = "60"
+				}
 				runTask(&Task{Path: "jd_wb.js", Envs: []Env{
-					{Name: "activityId", Value: ss[1]}, {Name: "inviter", Value: ss[3]}, {Name: "inviterCode", Value: ss[5]}, {Name: "helpMax", Value: "60"},
+					{Name: "activityId", Value: ss[1]}, {Name: "inviter", Value: ss[3]}, {Name: "inviteCode", Value: ss[5]}, {Name: "helpMax", Value: wbHelpMax}, {Name: "wbHelp", Value: wbHelp},
 				}}, sender)
 				return nil
 			}
