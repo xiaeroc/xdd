@@ -179,7 +179,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					wbHelp = "0"
 				}
 				wbHelpMax := GetEnv("wbHelpMax")
-				if wbHelp == "" {
+				if wbHelpMax == "" {
 					wbHelpMax = "60"
 				}
 				runTask(&Task{Path: "jd_wb.js", Envs: []Env{

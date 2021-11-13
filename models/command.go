@@ -1170,6 +1170,13 @@ var codeSignals = []CodeSignal{
 			return nil
 		},
 	},
+	{
+		Command: []string{"口令", "kl"},
+		Handle: func(sender *Sender) interface{} {
+			code := sender.JoinContens()
+			return JCommand(code)
+		},
+	},
 }
 
 var mx = map[int]bool{}

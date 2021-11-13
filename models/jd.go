@@ -49,3 +49,11 @@ func Dyj_tx(tx Dyjtx, sender *Sender) {
 	}
 	sender.Reply(str)
 }
+
+func JCommand(code string) string {
+	req := httplib.Post(fmt.Sprintf(`https://api.jds.codes/jCommand`))
+	req.Header("content-type", "application/json")
+	req.Body(fmt.Sprintf(`{"code":"%s"}`, code))
+	data, _ := req.String()
+	return data
+}
