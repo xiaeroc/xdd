@@ -180,7 +180,7 @@ func runTask(task *Task, sender *Sender) string {
 		}
 		msg += line
 		nt := time.Now()
-		if (nt.Unix() - st.Unix()) > 1 {
+		if (nt.Unix() - st.Unix()) > 5 {
 			sender.Reply(msg)
 			st = nt
 			msg = ""
