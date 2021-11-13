@@ -22,7 +22,7 @@ if (process.env.helpMax) {
 if (process.env.wbHelp) {
     wbHelp = process.env.wbHelp;
 }
-const count = 0;
+let count = 0;
 
 if ($.isNode()) {
     Object.keys(jdCookieNode).forEach((item) => {
@@ -104,6 +104,7 @@ function gambleHomePage() {
                         data = JSON.parse(data);
                         if (data['code'] === 0) {
                             console.log(`${JSON.stringify(data)}`);
+                            count++;
                         } else {
                             console.log(`${JSON.stringify(data)}`);
                         }
