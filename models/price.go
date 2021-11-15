@@ -70,14 +70,13 @@ type JdPrice struct {
 }
 
 func JdPriceFunc(str string) string {
-	rebateLink := GetRebateLink(fmt.Sprintf("https://item.jd.com/%s.html", str))
-	commodityName := ""
-	if rebateLink.Official != "" {
-		str1 := strings.Split(rebateLink.Official, "\n")
-		if len(str1) > 0 {
-			commodityName = str1[0]
-		}
+	materialUrl := ""
+	if IsNum(str) {
+		materialUrl = fmt.Sprintf("https://item.jd.com/%s.html", str)
+	} else {
+		materialUrl = fmt.Sprintf("https://u.jd.com/%s", str)
 	}
+	rebateLink := GetRebateLink(materialUrl)
 	req := httplib.Get(fmt.Sprintf("https://browser.bijiago.com/extension/price_towards?dp_ids=undefined&dp_id=%s-3&ver=1&format=jsonp&union=union_bijiago&version=1594190525099&from_device=bijiago&from_type=bjg_ser&crc64=1&_=%d", str, time.Now().Unix()))
 	req.Header("Connection", "keep-alive")
 	req.Header("sec-ch-ua", "\" Not A;Brand\";v=\"99\", \"Chromium\";v=\"90\", \"Google Chrome\";v=\"90\"")
@@ -97,21 +96,35 @@ func JdPriceFunc(str string) string {
 	logs.Info(req.String())
 	fmt.Println()
 	req.Response()
-	//logs.Info(	time.Unix(strconv.Itoa(), 1).Format("2006-01-02"))
-	s := price.Store[0]
-	if len(price.Store) >= 2 {
-		s = price.Store[1]
+	var build strings.Builder
+	if strs := strings.Split(rebateLink.Official, "\n"); len(strs) > 0 {
+		for i, str := range strs {
+			if i == 1 && price.Store[0].CurrentPrice != "" {
+				s := price.Store[0]
+				if len(price.Store) >= 2 {
+					s = price.Store[1]
+				}
+				_startDate, _ := strconv.ParseInt(s.MinStamp, 10, 64)
+				var ninStamp = time.Unix(_startDate, 0).Format("2006-01-02 15:04:05")
+				tip := ""
+				if price.Analysis.Tip != "" {
+					tip = price.Analysis.Tip
+				}
+				build.WriteString(fmt.Sprintf("\n%s \n最高价：%.0f  \n最低价：%.0f  %s\n%s：%.0f %s\n%s：%.0f %s\n比价结果仅供参考\n",
+					tip, s.Highest, s.Lowest, ninStamp[0:10],
+					price.Analysis.PromoDays[0].Show, price.Analysis.PromoDays[0].Price, price.Analysis.PromoDays[0].Date,
+					price.Analysis.PromoDays[1].Show, price.Analysis.PromoDays[1].Price, price.Analysis.PromoDays[1].Date))
+			}
+			if !strings.Contains(str, "佣金") && str != "" {
+				build.WriteString("\n")
+				build.WriteString(str)
+			}
+		}
 	}
-	_startDate, _ := strconv.ParseInt(s.MinStamp, 10, 64)
-	var ninStamp string = time.Unix(_startDate, 0).Format("2006-01-02 15:04:05")
-	tip := ""
-	if price.Analysis.Tip != "" {
-		tip = price.Analysis.Tip
-	}
-	sprintf := fmt.Sprintf("%s\n%s \n最高价：%.0f  \n最低价：%.0f  %s\n%s：%.0f %s\n%s：%.0f %s\n比价结果仅供参考\n\n当前价：%s \n去抢购   %s",
-		commodityName, tip, s.Highest, s.Lowest, ninStamp[0:10],
-		price.Analysis.PromoDays[0].Show, price.Analysis.PromoDays[0].Price, price.Analysis.PromoDays[0].Date,
-		price.Analysis.PromoDays[1].Show, price.Analysis.PromoDays[1].Price, price.Analysis.PromoDays[1].Date,
-		s.CurrentPrice, rebateLink.Content)
-	return sprintf
+	return build.String()
+}
+
+func IsNum(s string) bool {
+	_, err := strconv.ParseFloat(s, 64)
+	return err == nil
 }

@@ -418,7 +418,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				if res := regexp.MustCompile(rule).FindStringSubmatch(msg); len(res) > 0 {
 					//sender.SetMatch(res[1:])
 					// https://item.jd.com/" + id + ".html"
-					sender.Reply(JdPriceFunc(res[1]))
+					sender.Reply(JdPriceFunc(res[len(res)-1]))
 					matched = true
 				}
 			}
