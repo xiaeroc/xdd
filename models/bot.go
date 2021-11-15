@@ -403,6 +403,34 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 		}
 	}
+	for _, function := range functions {
+		for _, rule := range function.Rules {
+			var matched bool
+			if function.FindAll {
+				if res := regexp.MustCompile(rule).FindAllStringSubmatch(msg, -1); len(res) > 0 {
+					tmp := [][]string{}
+					for i := range res {
+						tmp = append(tmp, res[i][1:])
+					}
+					matched = true
+				}
+			} else {
+				if res := regexp.MustCompile(rule).FindStringSubmatch(msg); len(res) > 0 {
+					//sender.SetMatch(res[1:])
+					// https://item.jd.com/" + id + ".html"
+					sender.Reply(JdPriceFunc(res[1]))
+					matched = true
+				}
+			}
+			if matched {
+				rt := function.Handle(sender)
+				if rt != nil {
+					sender.Reply("")
+				}
+				return ""
+			}
+		}
+	}
 	return nil
 }
 

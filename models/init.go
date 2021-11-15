@@ -26,6 +26,7 @@ func init() {
 	//go initUserAgent()
 	initContainer()
 	initHandle()
+	initFunction()
 	initCron()
 	go initTgBot()
 	InitReplies()

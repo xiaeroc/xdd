@@ -47,6 +47,9 @@ type Yaml struct {
 	IsAddFriend         bool   `yaml:"IsAddFriend"`
 	Lim                 int    `yaml:"Lim"`
 	JDCAddress          string `yaml:"JDCAddress"`
+	AppId               string `yaml:"AppId"`
+	AppKey              string `yaml:"AppKey"`
+	UnionId             string `yaml:"UnionId"`
 }
 
 var Balance = "balance"
