@@ -146,8 +146,8 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				}
 			}
 		}
-		{ //tyt
-			ss := regexp.MustCompile(`packetId=(\S+)(&|&amp;)currentActId`).FindStringSubmatch(msg)
+		{ //tyt https://pushgold.jd.com/#/helper?packetId=6d899aec8f52481197bc544be93ef69b-amRfNzIyY2M1MDJlOTM4Nw!!&currentActId=d5a8c7198ee54de093d2adb04089d3ec&utm_user=plusmember&ad_od=share&utm_source=androidapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=QQfriends
+			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)&packetId=(\S+)(&|&amp;)currentActId`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
 				if !sender.IsAdmin {
 					coin := GetCoin(sender.UserID)
@@ -158,7 +158,8 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					sender.Reply("推一推即将开始，已扣除88个许愿币。")
 				}
 				runTask(&Task{Path: "jd_tyt.js", Envs: []Env{
-					{Name: "tytpacketId", Value: ss[1]},
+					{Name: "actId", Value: ss[1]},
+					{Name: "tytpacketId", Value: ss[3]},
 				}}, sender)
 				return nil
 			}
