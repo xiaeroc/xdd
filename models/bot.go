@@ -423,11 +423,11 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				}
 			}
 			if matched {
-				rt := function.Handle(sender)
-				if rt != nil {
-					sender.Reply("")
-				}
-				return ""
+				//rt := function.Handle(sender)
+				//if rt != nil {
+				//	sender.Reply("")
+				//}
+				//return ""
 			}
 		}
 	}
