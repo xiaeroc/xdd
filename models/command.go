@@ -98,8 +98,8 @@ func (sender *Sender) handleJdCookies(handle func(ck *JdCookie)) error {
 			}
 		}
 		if !ok {
-			sender.Reply("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。 请前往 https://dx.xiaero.cn/ 进行登录")
-			return errors.New("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。 请前往 https://dx.xiaero.cn/ 进行登录")
+			sender.Reply("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。 请前往 " + Config.JDCAddress + " 进行登录")
+			return errors.New("你尚未绑定🐶东账号，请抓取CK(不会抓的私聊群主，wsKey上车请私聊群主)私聊发机器人后即可查询账户资产信息。 请前往 " + Config.JDCAddress + " 进行登录")
 		}
 	} else {
 		cks = LimitJdCookie(cks, a)
