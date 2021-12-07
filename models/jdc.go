@@ -139,7 +139,13 @@ func JdcVerifyCode(phone string, code string, qq string) bool {
 	})
 	req.Body(body)
 	rsp, err := req.Response()
+	if err != nil {
+		return false
+	}
 	data, err := ioutil.ReadAll(rsp.Body)
+	if err != nil {
+		return false
+	}
 	obj := VerifyCodeResponse{}
 	err = json.Unmarshal(data, &obj)
 	if err == nil {
