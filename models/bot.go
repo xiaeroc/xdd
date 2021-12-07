@@ -147,7 +147,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 		}
 		{ //tyt https://pushgold.jd.com/#/helper?packetId=6d899aec8f52481197bc544be93ef69b-amRfNzIyY2M1MDJlOTM4Nw!!&currentActId=d5a8c7198ee54de093d2adb04089d3ec&utm_user=plusmember&ad_od=share&utm_source=androidapp&utm_medium=appshare&utm_campaign=t_335139774&utm_term=QQfriends
-			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)&packetId=(\S+)(&|&amp;)currentActId`).FindStringSubmatch(msg)
+			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)packetId=(\S+)(&|&amp;)currentActId`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
 				if !sender.IsAdmin {
 					coin := GetCoin(sender.UserID)
