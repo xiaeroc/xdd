@@ -2,6 +2,7 @@ package models
 
 import (
 	"fmt"
+	"github.com/Mrs4s/go-cqhttp/coolq"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -14,10 +15,10 @@ import (
 )
 
 var SendQQ = func(a int64, b interface{}) {
-
+	coolq.SendQQ(a, b, Config.QQGroupID)
 }
 var SendQQGroup = func(a int64, b int64, c interface{}) {
-
+	coolq.SendQQGroup(a, b, c)
 }
 var ListenQQPrivateMessage = func(uid int64, msg string) {
 	SendQQ(uid, handleMessage(msg, "qq", int(uid)))
