@@ -20,6 +20,7 @@ telegram_bot_token:
 telegram_user_id:
 qquid:
 qqgid:
+qqgids: QQ群2&QQ群3 #监听多个QQ群
 qbot_public_mode: true
 default_priority:
 no_ghproxy: false
