@@ -427,6 +427,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 			if matched {
 				sender.Reply(JdPriceFunc(str))
+				return ""
 				//rt := function.Handle(sender)
 				//if rt != nil {
 				//	sender.Reply("")
