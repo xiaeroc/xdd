@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/Mrs4s/go-cqhttp/cmd/gocq"
+	"github.com/Mrs4s/go-cqhttp/coolq"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -13,7 +15,6 @@ import (
 	"github.com/beego/beego/v2/server/web"
 	"github.com/xiaeroc/xdd/controllers"
 	"github.com/xiaeroc/xdd/models"
-	"github.com/xiaeroc/xdd/qbot"
 )
 
 var theme = ""
@@ -81,7 +82,9 @@ func main() {
 		(&models.JdCookie{}).Push("小滴滴已启动")
 	}()
 	if models.Config.QQID != 0 || models.Config.QQGroupID != 0 {
-		go qbot.Main()
+		go gocq.Main()
+		coolq.PrivateMessageEventCallback = models.ListenQQPrivateMessage
+		coolq.GroupMessageEventCallback = models.ListenQQGroupMessage
 	}
 	web.Run()
 }
