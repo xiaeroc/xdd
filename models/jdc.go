@@ -23,6 +23,7 @@ type SendSMSResponse struct {
 	Message string `json:"message"`
 	Data    struct {
 		Status   int `json:"status"`
+		Captcha  int `json:"captcha"`
 		Ckcount  int `json:"ckcount"`
 		Tabcount int `json:"tabcount"`
 	} `json:"data"`
@@ -82,11 +83,13 @@ func JdcSendSMS(sender *Sender, phone string) error {
 				logs.Info(obj.Message)
 			}
 			if obj.Data.Status == 666 {
-				logs.Info("安全验证")
-				JdcAutoCaptcha(sender, phone, 1)
+				if obj.Data.Captcha == 2 {
+					sender.Reply("出现文字验证码请前往手动验证：" + Config.JDCAddress + "/Captcha/" + phone)
+				} else {
+					JdcAutoCaptcha(sender, phone, 1)
+				}
 			}
 		}
-
 	} else {
 		sender.Reply("登录出现错误")
 	}
