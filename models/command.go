@@ -124,234 +124,6 @@ func (sender *Sender) handleTenRead(handle func(ck *TenRead)) error {
 }
 
 var codeSignals = []CodeSignal{
-	//{
-	//	Command: []string{`raw ^(\d{11})$`},
-	//	Handle: func(s *Sender) interface{} {
-	//		if num := 5; len(codes) >= num {
-	//			return fmt.Sprintf("%v坑位全部在使用中，请排队。", num)
-	//		}
-	//		id := "qq" + strconv.Itoa(s.UserID)
-	//		if _, ok := codes[id]; ok {
-	//			return "你已在登录中。"
-	//		}
-	//		go func() {
-	//			c := make(chan string, 1)
-	//			codes = make(map[string]chan string)
-	//			codes[id] = c
-	//			defer delete(codes, id)
-	//			var sess = new(Session)
-	//			phone := s.Contents[0]
-	//			logs.Info(phone)
-	//			s.Reply("请稍后，正在模拟环境...")
-	//			if err := sess.Phone(phone); err != nil {
-	//				s.Reply(err.Error())
-	//				return
-	//			}
-	//			send := false
-	//			login := false
-	//			verify := false
-	//			success := false
-	//			sms_code := ""
-	//			for {
-	//				query, _ := sess.query()
-	//				if query.PageStatus == "SESSION_EXPIRED" {
-	//					s.Reply("登录超时")
-	//					return
-	//				}
-	//				if query.SessionTimeOut == 0 {
-	//					if success {
-	//						return
-	//					}
-	//					s.Reply("登录超时")
-	//					return
-	//				}
-	//				if query.CanClickLogin && !login {
-	//					s.Reply("正在登录...")
-	//					if err := sess.login(phone, sms_code); err != nil {
-	//						s.Reply(err.Error())
-	//						return
-	//					}
-	//				}
-	//				if query.PageStatus == "VERIFY_FAILED_MAX" {
-	//					s.Reply("验证码错误次数过多，请重新获取。")
-	//					return
-	//				}
-	//				if query.PageStatus == "VERIFY_CODE_MAX" {
-	//					s.Reply("对不起，短信验证码请求频繁，请稍后再试。")
-	//					return
-	//				}
-	//				if query.PageStatus == "REQUIRE_VERIFY" && !verify {
-	//					verify = true
-	//					s.Reply("正在自动验证...")
-	//					if err := sess.crackCaptcha(); err != nil {
-	//						s.Reply(err.Error())
-	//						return
-	//					}
-	//					s.Reply("验证通过。")
-	//					s.Reply("请输入验证码______")
-	//					select {
-	//					case sms_code = <-c:
-	//						s.Reply("正在提交验证码...")
-	//						if err := sess.SmsCode(sms_code); err != nil {
-	//							s.Reply(err.Error())
-	//							return
-	//						}
-	//						s.Reply("验证码提交成功。")
-	//					case <-time.After(60 * time.Second):
-	//						s.Reply("验证码超时。")
-	//						return
-	//
-	//					}
-	//				}
-	//				if query.CanSendAuth && !send {
-	//					if err := sess.sendAuthCode(); err != nil {
-	//						s.Reply(err.Error())
-	//						return
-	//					}
-	//					send = true
-	//				}
-	//				if !query.CanSendAuth && query.AuthCodeCountDown > 0 {
-	//
-	//				}
-	//				if query.AuthCodeCountDown == -1 && send {
-	//
-	//				}
-	//				if query.PageStatus == "SUCCESS_CK" && !success {
-	//					//Sender <- &Faker{
-	//					//	Message: fmt.Sprintf("pt_key=%v;pt_pin=%v;", query.Ck.PtKey, query.Ck.PtPin),
-	//					//	UserID:  s.GetUserID(),
-	//					//	Type:    s.GetImType(),
-	//					//}
-	//					s.Reply(fmt.Sprintf("登录成功，%v秒后可以登录下一个账号。", query.SessionTimeOut))
-	//					success = true
-	//				}
-	//				time.Sleep(time.Second)
-	//			}
-	//		}()
-	//
-	//		return nil
-	//	},
-	//},
-	//{
-	//	Command: []string{`raw ^(\d{11})$`},
-	//	Handle: func(s *Sender) interface{} {
-	//		if num := 5; len(codes) >= num {
-	//			return fmt.Sprintf("%v坑位全部在使用中，请排队。", num)
-	//		}
-	//		id := "qq" + strconv.Itoa(s.UserID)
-	//		if _, ok := codes[id]; ok {
-	//			return "你已在登录中。"
-	//		}
-	//		go func() {
-	//			c := make(chan string, 1)
-	//			codes = make(map[string]chan string)
-	//			codes[id] = c
-	//			defer delete(codes, id)
-	//			var sess = new(Session)
-	//			phone := s.Contents[0]
-	//			logs.Info(phone)
-	//			s.Reply("请稍后，正在模拟环境...")
-	//			if err := sess.Phone(phone); err != nil {
-	//				s.Reply(err.Error())
-	//				return
-	//			}
-	//			send := false
-	//			login := false
-	//			verify := false
-	//			success := false
-	//			sms_code := ""
-	//			for {
-	//				query, _ := sess.query()
-	//				if query.PageStatus == "SESSION_EXPIRED" {
-	//					s.Reply("登录超时")
-	//					return
-	//				}
-	//				if query.SessionTimeOut == 0 {
-	//					if success {
-	//						return
-	//					}
-	//					s.Reply("登录超时")
-	//					return
-	//				}
-	//				if query.CanClickLogin && !login {
-	//					s.Reply("正在登录...")
-	//					if err := sess.login(phone, sms_code); err != nil {
-	//						s.Reply(err.Error())
-	//						return
-	//					}
-	//				}
-	//				if query.PageStatus == "VERIFY_FAILED_MAX" {
-	//					s.Reply("验证码错误次数过多，请重新获取。")
-	//					return
-	//				}
-	//				if query.PageStatus == "VERIFY_CODE_MAX" {
-	//					s.Reply("对不起，短信验证码请求频繁，请稍后再试。")
-	//					return
-	//				}
-	//				if query.PageStatus == "REQUIRE_VERIFY" && !verify {
-	//					verify = true
-	//					s.Reply("正在自动验证...")
-	//					if err := sess.crackCaptcha(); err != nil {
-	//						s.Reply(err.Error())
-	//						return
-	//					}
-	//					s.Reply("验证通过。")
-	//					s.Reply("请输入验证码______")
-	//					select {
-	//					case sms_code = <-c:
-	//						s.Reply("正在提交验证码...")
-	//						if err := sess.SmsCode(sms_code); err != nil {
-	//							s.Reply(err.Error())
-	//							return
-	//						}
-	//						s.Reply("验证码提交成功。")
-	//					case <-time.After(60 * time.Second):
-	//						s.Reply("验证码超时。")
-	//						return
-	//
-	//					}
-	//				}
-	//				if query.CanSendAuth && !send {
-	//					if err := sess.sendAuthCode(); err != nil {
-	//						s.Reply(err.Error())
-	//						return
-	//					}
-	//					send = true
-	//				}
-	//				if !query.CanSendAuth && query.AuthCodeCountDown > 0 {
-	//
-	//				}
-	//				if query.AuthCodeCountDown == -1 && send {
-	//
-	//				}
-	//				if query.PageStatus == "SUCCESS_CK" && !success {
-	//					//Sender <- &Faker{
-	//					//	Message: fmt.Sprintf("pt_key=%v;pt_pin=%v;", query.Ck.PtKey, query.Ck.PtPin),
-	//					//	UserID:  s.GetUserID(),
-	//					//	Type:    s.GetImType(),
-	//					//}
-	//					s.Reply(fmt.Sprintf("登录成功，%v秒后可以登录下一个账号。", query.SessionTimeOut))
-	//					success = true
-	//				}
-	//				time.Sleep(time.Second)
-	//			}
-	//		}()
-	//
-	//		return nil
-	//	},
-	//},
-	//{
-	//	Command: []string{`raw ^(\d{6})$`},
-	//	Handle: func(s *Sender) interface{} {
-	//		if code, ok := codes["qq"+fmt.Sprint(s.UserID)]; ok {
-	//			code <-  s.Contents[0]
-	//			logs.Info(code)
-	//		} else {
-	//			s.Reply("验证码不存在或过期了，请重新登录。")
-	//		}
-	//		return nil
-	//	},
-	//},
 	{
 		Command: []string{"登录", "短信登录", "账号登录"},
 		Handle: func(s *Sender) interface{} {
@@ -427,20 +199,6 @@ var codeSignals = []CodeSignal{
 			return fmt.Sprintf("余额%d", GetCoin(sender.UserID))
 		},
 	},
-	//{
-	//	Command: []string{"qrcode", "扫码", "二维码", "scan"},
-	//	Handle: func(sender *Sender) interface{} {
-	//		//url := fmt.Sprintf("http://127.0.0.1:%d/api/login/qrcode.png?tp=%s&uid=%d&gid=%d", web.BConfig.Listen.HTTPPort, sender.Type, sender.UserID, sender.ChatID)
-	//		//if sender.Type == "tgg" {
-	//		//	url += fmt.Sprintf("&mid=%v&unm=%v", sender.MessageID, sender.Username)
-	//		//}
-	//		//rsp, err := httplib.Get(url).Response()
-	//		//if err != nil {
-	//		//	return nil
-	//		//}
-	//		return "私聊发送CK给机器人即可，格式: pt_key=xxxx;pt_pin=xxxx;\n不会抓取CK请私聊群主，wsKey上车请私聊群主\n直接抓到的Ck中间有空格！！！！ 请去掉再发给机器人"
-	//	},
-	//},
 	{
 		Command: []string{"QQ扫码", "qq扫码"},
 		Handle: func(sender *Sender) interface{} {
@@ -1136,13 +894,19 @@ var codeSignals = []CodeSignal{
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			sender.Reply(fmt.Sprintf("PtKey为空并且是false的账号"))
+			msg := "已清理账号\n"
 			sender.handleJdCookies(func(ck *JdCookie) {
-				if ck.Available != True {
+				if ck.PtKey == "" && ck.Wskey == "" {
 					ck.Removes(ck)
-					sender.Reply(fmt.Sprintf("已清理账号%s", ck.Nickname))
+					if ck.Nickname == "" {
+						msg += ck.PtPin
+					} else {
+						msg += ck.Nickname
+					}
+
 				}
 			})
-			return nil
+			return msg
 		},
 	},
 	{
@@ -1166,6 +930,24 @@ var codeSignals = []CodeSignal{
 		Handle: func(sender *Sender) interface{} {
 			code := sender.JoinContens()
 			return JCommand(code)
+		},
+	},
+	{
+		Command: []string{"设置管理员"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			ctt := sender.JoinContens()
+			db.Create(&UserAdmin{Content: ctt})
+			return "已设置管理员"
+		},
+	},
+	{
+		Command: []string{"取消管理员"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			ctt := sender.JoinContens()
+			RemoveUserAdmin(ctt)
+			return "已取消管理员"
 		},
 	},
 }
