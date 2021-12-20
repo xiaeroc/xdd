@@ -894,14 +894,14 @@ var codeSignals = []CodeSignal{
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			sender.Reply(fmt.Sprintf("PtKey为空并且是false的账号"))
-			msg := "已清理账号\n"
+			msg := "已清理账号"
 			for _, ck := range GetJdCookies() {
 				if ck.PtKey == "" && ck.Wskey == "" {
 					ck.Removes(ck)
 					if ck.Nickname == "" {
-						msg += ck.PtPin
+						msg += "\n" + ck.PtPin
 					} else {
-						msg += ck.Nickname
+						msg += "\n" + ck.Nickname
 					}
 				}
 			}
