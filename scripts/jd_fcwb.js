@@ -5,12 +5,12 @@ const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
-let activityId = '', inviter = '', inviteCode = '', wbhelpMax  = '30',wbhelp  = '0';
+let activityId = '', inviterId = '', inviteCode = '', wbhelpMax  = '30',wbhelp  = '0';
 if (process.env.activityId) {
     activityId = process.env.activityId;
 }
-if (process.env.inviter) {
-    inviter = process.env.inviter;
+if (process.env.inviterId) {
+    inviterId = process.env.inviterId;
 }
 if (process.env.inviteCode) {
     inviteCode = process.env.inviteCode;
