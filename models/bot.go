@@ -181,16 +181,16 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					RemCoin(sender.UserID, 188)
 					sender.Reply("发财挖宝即将开始，已扣除88个许愿币。")
 				}
-				wbHelp := GetEnv("wbHelp")
-				if wbHelp == "" {
-					wbHelp = "0"
+				wbhelp := GetEnv("wbhelp")
+				if wbhelp == "" {
+					wbhelp = "0"
 				}
-				wbHelpMax := GetEnv("wbHelpMax")
-				if wbHelpMax == "" {
-					wbHelpMax = "60"
+				wbhelpMax := GetEnv("wbhelpMax")
+				if wbhelpMax == "" {
+					wbhelpMax = "30"
 				}
-				runTask(&Task{Path: "jd_wb.js", Envs: []Env{
-					{Name: "activityId", Value: ss[1]}, {Name: "inviter", Value: ss[3]}, {Name: "inviteCode", Value: ss[5]}, {Name: "helpMax", Value: wbHelpMax}, {Name: "wbHelp", Value: wbHelp},
+				runTask(&Task{Path: "jd_fcwb.js", Envs: []Env{
+					{Name: "activityId", Value: ss[1]}, {Name: "inviter", Value: ss[3]}, {Name: "inviteCode", Value: ss[5]}, {Name: "wbhelpMax", Value: wbhelpMax}, {Name: "wbhelp", Value: wbhelp},
 				}}, sender)
 				return nil
 			}
