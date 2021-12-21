@@ -890,12 +890,12 @@ var codeSignals = []CodeSignal{
 		},
 	},
 	{
-		Command: []string{"删除账号", "删除"},
+		Command: []string{"删除账号", "删除", "清理过期"},
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			sender.Reply(fmt.Sprintf("PtKey为空并且是false的账号"))
 			msg := "已清理账号\n"
-			sender.handleJdCookies(func(ck *JdCookie) {
+			for _, ck := range GetJdCookies() {
 				if ck.PtKey == "" && ck.Wskey == "" {
 					ck.Removes(ck)
 					if ck.Nickname == "" {
@@ -903,9 +903,8 @@ var codeSignals = []CodeSignal{
 					} else {
 						msg += ck.Nickname
 					}
-
 				}
-			})
+			}
 			return msg
 		},
 	},
