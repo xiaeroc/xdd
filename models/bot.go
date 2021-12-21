@@ -190,7 +190,7 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					wbhelpMax = "30"
 				}
 				runTask(&Task{Path: "jd_fcwb.js", Envs: []Env{
-					{Name: "activityId", Value: ss[1]}, {Name: "inviter", Value: ss[3]}, {Name: "inviteCode", Value: ss[5]}, {Name: "wbhelpMax", Value: wbhelpMax}, {Name: "wbhelp", Value: wbhelp},
+					{Name: "activityId", Value: ss[1]}, {Name: "inviterId", Value: ss[3]}, {Name: "inviteCode", Value: ss[5]}, {Name: "wbhelpMax", Value: wbhelpMax}, {Name: "wbhelp", Value: wbhelp},
 				}}, sender)
 				return nil
 			}
