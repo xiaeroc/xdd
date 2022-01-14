@@ -213,7 +213,7 @@ func CookieOK(ck *JdCookie) bool {
 							logs.Info(msg)
 						} else {
 							//nck.Update(Available, False)
-							(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", nck.PtPin))
+							(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", ck.PtPin))
 						}
 					}
 
@@ -260,7 +260,7 @@ func CookieOK(ck *JdCookie) bool {
 							logs.Info(msg)
 						} else {
 							//nck.Update(Available, False)
-							(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", nck.PtPin))
+							(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", ck.PtPin))
 						}
 					}
 
@@ -356,7 +356,7 @@ func CookieOK2(ck *JdCookie) bool {
 						logs.Info(msg)
 					} else {
 						//nck.Update(Available, False)
-						(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", nck.PtPin))
+						(&JdCookie{}).Push(fmt.Sprintf("转换失败，%s", ck.PtPin))
 					}
 				}
 
