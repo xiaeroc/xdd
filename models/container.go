@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/beego/beego/v2/client/httplib"
+	"github.com/beego/beego/v2/core/logs"
+	"github.com/buger/jsonparser"
 	"io"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/beego/beego/v2/client/httplib"
-	"github.com/beego/beego/v2/core/logs"
-	"github.com/buger/jsonparser"
 )
 
 const (
@@ -136,6 +135,7 @@ func (c *Container) Write(cks []JdCookie) error {
 					Data []struct {
 						Value     string  `json:"value"`
 						ID        string  `json:"_id"`
+						IntID     int     `json:"id"`
 						Created   int64   `json:"created"`
 						Status    int     `json:"status"`
 						Timestamp string  `json:"timestamp"`
@@ -155,7 +155,11 @@ func (c *Container) Write(cks []JdCookie) error {
 						}
 						toDelete := []string{}
 						for _, env := range a.Data {
-							toDelete = append(toDelete, fmt.Sprintf("\"%s\"", env.ID))
+							if env.IntID == 0 {
+								toDelete = append(toDelete, fmt.Sprintf("\"%s\"", env.ID))
+							} else {
+								toDelete = append(toDelete, fmt.Sprintf("\"%d\"", env.IntID))
+							}
 						}
 						if len(toDelete) > 0 {
 							c.request("/api/envs", DELETE, fmt.Sprintf(`[%s]`, strings.Join(toDelete, ",")))
@@ -250,6 +254,7 @@ func (c *Container) read() error {
 				Data []struct {
 					Value     string  `json:"value"`
 					ID        string  `json:"_id"`
+					IntID     int     `json:"id"`
 					Created   int64   `json:"created"`
 					Status    int     `json:"status"`
 					Timestamp string  `json:"timestamp"`
@@ -266,9 +271,12 @@ func (c *Container) read() error {
 				return err
 			}
 			c.Delete = []string{}
-
 			for _, env := range a.Data {
-				c.Delete = append(c.Delete, fmt.Sprintf("\"%s\"", env.ID))
+				if env.IntID == 0 {
+					c.Delete = append(c.Delete, fmt.Sprintf("\"%s\"", env.ID))
+				} else {
+					c.Delete = append(c.Delete, fmt.Sprintf("\"%d\"", env.IntID))
+				}
 				res := regexp.MustCompile(`pt_key=(\S+);pt_pin=([^\s;]+);?`).FindAllStringSubmatch(env.Value, -1)
 				for _, v := range res {
 					CheckIn(v[2], v[1])

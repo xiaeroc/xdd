@@ -28,7 +28,7 @@ func init() {
 	initContainer()
 	initHandle()
 	initFunction()
-	initCron()
+	//initCron()
 	go initTgBot()
 	InitReplies()
 	initTask()
