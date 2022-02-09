@@ -11,8 +11,8 @@ import (
 	"github.com/beego/beego/v2/core/logs"
 )
 
-var version = "20220208"
-var describe = "重大更新 适配青龙2.11"
+var version = "20220209"
+var describe = "v2022-02-09 青龙2.11+ 适配 wskey转换同步更新"
 var AppName = "xdd"
 var pname = regexp.MustCompile(`/([^/\s]+)`).FindStringSubmatch(os.Args[0])[1]
 

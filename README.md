@@ -1,6 +1,6 @@
 # xdd
 基于XDD改版
-## 更新适配青龙 2.9+ 有问题请 提交issues
+## 更新适配青龙 2.11+ 有问题请 提交issues
 --- 
 更新说明
 * 修复机器人遇到的登录问题 需要更新go版本号到1.17
@@ -15,7 +15,10 @@ https://dl.google.com/go/go1.17.4.linux-amd64.tar.gz
 * 删除账号指定账号 delete/dl 账号/1-1/QQ
 * 删除账号过期账号 删除账号/删除
 --- 
+
 更新说明
+* v2022-02-09 青龙2.11+ 适配 wskey转换同步更新
+* 
 * 青龙2.9新增配置文件值 client_id client_secret
 ---
     git clone https://ghproxy.com/https://github.com/xiaeroc/xdd.git
