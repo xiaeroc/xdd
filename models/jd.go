@@ -51,7 +51,7 @@ func Dyj_tx(tx Dyjtx, sender *Sender) {
 }
 
 func JCommand(code string) string {
-	req := httplib.Post(fmt.Sprintf(`https://api.jds.codes/jCommand`))
+	req := httplib.Post(fmt.Sprintf(`https://api.jds.codes/jd/jcommand`))
 	req.Header("content-type", "application/json")
 	req.Body(fmt.Sprintf(`{"code":"%s"}`, code))
 	data, _ := req.String()
