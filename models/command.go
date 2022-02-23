@@ -928,7 +928,11 @@ var codeSignals = []CodeSignal{
 		Command: []string{"口令", "kl"},
 		Handle: func(sender *Sender) interface{} {
 			code := sender.JoinContens()
-			return JCommand(code)
+			command := JCommand(code)
+			if command != "" {
+				return command
+			}
+			return nil
 		},
 	},
 	{
