@@ -98,9 +98,6 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 		{
 			ss := regexp.MustCompile(`^(\d{11})$`).FindStringSubmatch(msg)
 			if len(ss) > 0 {
-				if Config.JDCAddress == "" {
-					return "未配置JDC"
-				}
 				if num := 5; len(codes) >= num {
 					return fmt.Sprintf("%v坑位全部在使用中，请排队。", num)
 				}
@@ -116,15 +113,43 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					phone := ss[0]
 					logs.Info(phone)
 					sender.Reply("请稍后，正在模拟环境...")
-					JdcSendSMS(sender, phone)
+					quick := SendSMS(sender, phone)
 					sms_code := ""
 					select {
 					case sms_code = <-c:
 						sender.Reply("正在提交验证码...")
-						code := JdcVerifyCode(phone, sms_code, fmt.Sprintf("%d", sender.UserID))
-						if code {
-							//cookie, _ := GetJdCookie(code)
-							//cookie.Update(QQ, sender.UserID)
+						smsCk := VerifyCode(phone, sms_code, quick)
+						if smsCk.ErrCode == 0 {
+							ck := JdCookie{
+								PtKey: smsCk.Data.PtKey,
+								PtPin: smsCk.Data.PtPin,
+								Hack:  False,
+								QQ:    sender.UserID,
+							}
+							if CookieOK(&ck) {
+								if sender.IsQQ() {
+									ck.QQ = sender.UserID
+								} else if sender.IsTG() {
+									ck.Telegram = sender.UserID
+								}
+								if nck, err := GetJdCookie(ck.PtPin); err == nil {
+									if nck.QQ == 0 {
+										nck.InPoolQQ(ck.PtKey, sender.UserID)
+									} else {
+										nck.InPool(ck.PtKey)
+									}
+									sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
+								} else {
+									if Cdle {
+										ck.Hack = True
+									}
+									NewJdCookie(&ck)
+									sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+								}
+								for i := range Config.Containers {
+									(&Config.Containers[i]).Write([]JdCookie{ck})
+								}
+							}
 							sender.Reply("登录成功...")
 						} else {
 							sender.Reply("登录失败...")
