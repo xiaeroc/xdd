@@ -544,24 +544,8 @@ var codeSignals = []CodeSignal{
 		Command: []string{"upck", "刷新ck"},
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
-			num := 0
-			unNum := 0
-			str := ""
-			sender.handleJdCookies(func(ck *JdCookie) {
-				if ck.Wskey == "" {
-					unNum++
-					//sender.Reply(fmt.Sprintf("账号%s(%s,QQ:%d)未配置Wskey更新ck失败。", ck.PtPin, ck.Nickname, ck.QQ))
-				} else {
-					envs := []Env{}
-					envs = append(envs, Env{
-						Name:  "wsKey",
-						Value: ck.Wskey,
-					})
-					num = num + 1
-					str = str + runTask(&Task{Path: "Jd_UpdateCk.py", Envs: envs}, sender)
-				}
-			})
-			return fmt.Sprintf("共刷新%d账号 未配置wsKey账号%d。%s", num, unNum, str)
+			updateCookie()
+			return nil
 		},
 	},
 	{
