@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var ua2 = `okhttp/3.12.1;jdmall;android;version/10.1.2;build/89743;screen/1440x3007;os/11;network/wifi;`
@@ -97,12 +98,16 @@ func checkCloud() string {
 	urlList := []string{"aHR0cDovLzQzLjEzNS45MC4yMy8=", "aHR0cHM6Ly9zaGl6dWt1Lm1sLw==", "aHR0cHM6Ly9jZi5zaGl6dWt1Lm1sLw=="}
 	for i := range urlList {
 		decodeString, _ := base64.StdEncoding.DecodeString(urlList[i])
-		_, err := httplib.Get(string(decodeString)).String()
-		if err == nil {
+		req := httplib.Get(string(decodeString))
+		req.Header("User-Agent", "python-requests/2.25.1")
+		s, err := req.String()
+		logs.Info(s, err)
+		if strings.Contains(s, "200") && err == nil {
 			return string(decodeString)
 		}
 	}
-	return ""
+	decodeString, _ := base64.StdEncoding.DecodeString(urlList[0])
+	return string(decodeString)
 }
 
 type T struct {
@@ -132,20 +137,43 @@ type T2 struct {
 }
 
 func cloudInfo(url string) string {
-	req := httplib.Get(url + "check_api")
-	req.Header("authorization", "Bearer Shizuku")
-	s, _ := req.Bytes()
-	t := T{}
-	json.Unmarshal(s, &t)
-	return t.UserAgent
+	// 重试10次
+	for i := 0; i <= 10; i++ {
+		req := httplib.Get(url + "check_api")
+		req.Header("User-Agent", "python-requests/2.25.1")
+		req.Header("authorization", "Bearer Shizuku")
+		s, _ := req.Bytes()
+		t := T{}
+		json.Unmarshal(s, &t)
+		logs.Info(t.UserAgent)
+		if t.UserAgent != "" {
+			return t.UserAgent
+		}
+		time.Sleep(time.Second * 2)
+	}
+	// 重试10次 还是失败 搞个默认值
+	return "jdapp;android;10.3.5;;;appBuild/92468;ef/1;ep/{\"hdid\":\"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=\",\"ts\":1647918020020,\"ridx\":-1,\"cipher\":{\"sv\":\"CJS=\",\"ad\":\"EWOzY2ZuCNHsEWHvEJc3EG==\",\"od\":\"ENY0CJS3ZtvvCtK5ZJC5Yq==\",\"ov\":\"CzO=\",\"ud\":\"EWOzY2ZuCNHsEWHvEJc3EG==\"},\"ciphertype\":5,\"version\":\"1.2.0\",\"appname\":\"com.jingdong.app.mall\"};Mozilla/5.0 (Linux; Android 12; M2102K1C Build/SKQ1.211006.001; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/97.0.4692.98 Mobile Safari/537.36"
 }
+func getToken1(urls string, ua string) T2 {
+	t := T2{}
+	for i := 0; i <= 10; i++ {
+		req1 := httplib.Get(urls + "genToken")
+		req1.Header("User-Agent", ua)
+		s, _ := req1.Bytes()
+		json.Unmarshal(s, &t)
+		if t.Sign != "" {
+			return t
+		}
+		time.Sleep(time.Second * 2)
+	}
+	bytes := []byte("{\"functionId\":\"genToken\",\"clientVersion\":\"10.3.5\",\"build\":\"92468\",\"client\":\"android\",\"partner\":\"google\",\"oaid\":\"06lr6e4tz0n0hjsq\",\"sdkVersion\":\"31\",\"lang\":\"zh_CN\",\"harmonyOs\":\"0\",\"networkType\":\"UNKNOWN\",\"uemps\":\"0-2\",\"ext\":\"{\\\"prstate\\\": \\\"0\\\", \\\"pvcStu\\\": \\\"1\\\"}\",\"ef\":\"1\",\"ep\":\"{\\\"hdid\\\":\\\"JM9F1ywUPwflvMIpYPok0tt5k9kW4ArJEU3lfLhxBqw=\\\",\\\"ts\\\":1647918629476,\\\"ridx\\\":-1,\\\"cipher\\\":{\\\"d_model\\\":\\\"JWunCVVidRTr\\\",\\\"wifiBssid\\\":\\\"dW5hbw93bq==\\\",\\\"osVersion\\\":\\\"CJS=\\\",\\\"d_brand\\\":\\\"WQvrb21f\\\",\\\"screen\\\":\\\"CJuyCMenCNq=\\\",\\\"uuid\\\":\\\"oXVmbQ1uD3P6azYzczLfbG==\\\",\\\"aid\\\":\\\"oXVmbQ1uD3P6azYzczLfbG==\\\",\\\"openudid\\\":\\\"oXVmbQ1uD3P6azYzczLfbG==\\\"},\\\"ciphertype\\\":5,\\\"version\\\":\\\"1.2.0\\\",\\\"appname\\\":\\\"com.jingdong.app.mall\\\"}\",\"st\":1647918629476,\"sign\":\"48869070986ea43e1b9dd6c4aad60ca7\",\"sv\":\"120\"}")
+	json.Unmarshal(bytes, &t)
+	return T2{}
+}
+
 func getToken(urls string, wskey string) (string, error) {
 	ua := cloudInfo(urls)
-	req1 := httplib.Get(urls + "genToken")
-	req1.Header("User-Agent", ua)
-	s, _ := req1.Bytes()
-	t := T2{}
-	json.Unmarshal(s, &t)
+	t := getToken1(urls, ua)
 	v := url.Values{}
 	v.Add("functionId", t.FunctionId)
 	v.Add("clientVersion", t.ClientVersion)
