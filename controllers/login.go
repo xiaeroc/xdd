@@ -460,20 +460,6 @@ func (c *LoginController) SMSLogin() {
 						(&models.JdCookie{}).Push(msg)
 					}
 				}
-				//if nck, err := models.GetJdCookie(ck.PtPin); err == nil {
-				//	models.NewJdCookie2(ck)
-				//	ck.Query()
-				//	msg := fmt.Sprintf("来自短信的添加,账号：%s,QQ: %s", ck.PtPin, qq)
-				//	(&models.JdCookie{}).Push(msg)
-				//} else if !models.HasKey(ptKey) {
-				//	ck, _ := models.GetJdCookie(ptPin)
-				//	ck.InPool(ptKey)
-				//	if qq != "" {
-				//		ck.Update(models.QQ, qq)
-				//	}
-				//	msg := fmt.Sprintf("来自短信的更新,账号：%s", ck.PtPin)
-				//	(&models.JdCookie{}).Push(msg)
-				//}
 				result := Result{
 					Data:    "null",
 					Code:    200,

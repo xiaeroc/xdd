@@ -127,7 +127,7 @@ var codeSignals = []CodeSignal{
 	{
 		Command: []string{"登录", "登陆", "短信登录", "账号登录"},
 		Handle: func(s *Sender) interface{} {
-			s.Reply(fmt.Sprintf("请输入手机号___________ 或者前往 %s 进行登录", Config.JDCAddress))
+			s.Reply(fmt.Sprintf("请私聊机器人ck进行登录,不会请找管理"))
 			return nil
 		},
 	},
@@ -545,6 +545,22 @@ var codeSignals = []CodeSignal{
 		Admin:   true,
 		Handle: func(sender *Sender) interface{} {
 			updateCookie()
+			return nil
+		},
+	},
+	{
+		Command: []string{"dlWskey", "dlwskey", "删除wskey"},
+		Admin:   true,
+		Handle: func(sender *Sender) interface{} {
+			a := sender.JoinContens()
+			if a == "" {
+				sender.Reply(fmt.Sprintf("请指定要删除的账号"))
+				return nil
+			}
+			sender.handleJdCookies(func(ck *JdCookie) {
+				ck.Update("Wskey", "")
+				sender.Reply(fmt.Sprintf("已清理WsKey%s ", ck.Nickname))
+			})
 			return nil
 		},
 	},
