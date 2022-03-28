@@ -196,7 +196,8 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 		}
 		{ //挖宝
-			if strings.Contains(msg, "https://api.m.jd.com/?functionId=happyDigHelp&body=") {
+			if strings.Contains(msg, "https://api.m.jd.com/?functionId=happyDigHelp&amp;body=") {
+				msg = strings.Replace(msg, "&amp;", "&", -1)
 				if sender.IsAdmin {
 					wbhelp := GetEnv("wbhelp")
 					if wbhelp == "" {

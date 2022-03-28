@@ -35,9 +35,12 @@ func initHandle() {
 			cookies := "{"
 			hh := []string{}
 			for i, ck := range cks {
-				hh = append(hh,
-					fmt.Sprintf("CookieJD%d:'pt_key=%s;pt_pin=%s;'", i+1, ck.PtKey, ck.PtPin),
-				)
+				if ck.PtKey != "" {
+					hh = append(hh,
+						fmt.Sprintf("CookieJD%d:'pt_key=%s;pt_pin=%s;'", i+1, ck.PtKey, ck.PtPin),
+					)
+				}
+
 			}
 			cookies += strings.Join(hh, ",")
 			cookies += "}"
