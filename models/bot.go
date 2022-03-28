@@ -196,27 +196,20 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 			}
 		}
 		{ //挖宝
-			ss := regexp.MustCompile(`activityId=(\S+)(&|&amp;)inviterId=(\S+)(&|&amp;)inviterCode=(\w+)(&|&amp;)`).FindStringSubmatch(msg)
-			if len(ss) > 6 {
-				if !sender.IsAdmin {
-					coin := GetCoin(sender.UserID)
-					if coin < 188 {
-						return "发财挖宝需要88个许愿币。"
+			if strings.Contains(msg, "https://api.m.jd.com/?functionId=happyDigHelp&body=") {
+				if sender.IsAdmin {
+					wbhelp := GetEnv("wbhelp")
+					if wbhelp == "" {
+						wbhelp = "3"
 					}
-					RemCoin(sender.UserID, 188)
-					sender.Reply("发财挖宝即将开始，已扣除88个许愿币。")
+					wbhelpMax := GetEnv("wbhelpMax")
+					if wbhelpMax == "" {
+						wbhelpMax = "40"
+					}
+					runTask(&Task{Path: "jd_fcwb.js", Envs: []Env{
+						{Name: "url", Value: msg}, {Name: "wbhelpMax", Value: wbhelpMax}, {Name: "wbhelp", Value: wbhelp},
+					}}, sender)
 				}
-				wbhelp := GetEnv("wbhelp")
-				if wbhelp == "" {
-					wbhelp = "0"
-				}
-				wbhelpMax := GetEnv("wbhelpMax")
-				if wbhelpMax == "" {
-					wbhelpMax = "30"
-				}
-				runTask(&Task{Path: "jd_fcwb.js", Envs: []Env{
-					{Name: "activityId", Value: ss[1]}, {Name: "inviterId", Value: ss[3]}, {Name: "inviteCode", Value: ss[5]}, {Name: "wbhelpMax", Value: wbhelpMax}, {Name: "wbhelp", Value: wbhelp},
-				}}, sender)
 				return nil
 			}
 		}

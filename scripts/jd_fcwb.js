@@ -5,15 +5,10 @@ const jdCookieNode = $.isNode() ? require('./jdCookie.js') : '';
 
 //IOS等用户直接用NobyDa的jd cookie
 let cookiesArr = [], cookie = '', message;
-let activityId = '', inviterId = '', inviteCode = '', wbhelpMax  = '30',wbhelp  = '0';
-if (process.env.activityId) {
-    activityId = process.env.activityId;
-}
-if (process.env.inviterId) {
-    inviterId = process.env.inviterId;
-}
-if (process.env.inviteCode) {
-    inviteCode = process.env.inviteCode;
+let url = '',
+    wbhelpMax  = '40',wbhelp  = '3';
+if (process.env.url) {
+    url = process.env.url;
 }
 if (process.env.wbhelpMax) {
     wbhelpMax = process.env.wbhelpMax;
@@ -72,7 +67,7 @@ const JD_API_HOST = 'https://api.m.jd.com/client.action';
 function tythelp() {
     return new Promise(async (resolve) => {
         let options = {
-            url: `https://api.m.jd.com/?functionId=happyDigHelp&body=%7B%22linkId%22%3A%22${activityId}%22%2C%22round%22%3A1%2C%22inviter%22%3A%22${inviterId}%22%2C%22inviteCode%22%3A%22${inviteCode}%22%7D&t=1640017392632&appid=activities_platform&client=H5&clientVersion=1.0.0&h5st=20211221002313772%3B7544639105662366%3B8dd95%3Btk02wbb671be018nnQrM%2FQzrfxnMsouY5YGzOvd%2FkD7yHUla%2FUKK2F7RwN97I%2B39tYqxxVy5j3QPTDh085fl63wTVDfj%3B223d9e6a1f83f945258d28389f16ac501c61c00fc4d52b92fb2d591f39321ddb%3B3.0%3B1640017393772`,
+            url: `${url}`,
             headers: {
                 'Host': 'api.m.jd.com',
                 'accept': 'application/json, text/plain, */*',
