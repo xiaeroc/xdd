@@ -66,6 +66,7 @@ type JCommandDate struct {
 func JCommand(code string) string {
 	req := httplib.Post(fmt.Sprintf(`https://api.jds.codes/jd/jcommand`))
 	req.Header("content-type", "application/json")
+	req.Header("Authorization", "Bearer "+GetEnv("panda"))
 	req.Body(fmt.Sprintf(`{"code":"%s"}`, code))
 	data, err := req.Bytes()
 	jCommandDate := JCommandDate{}
