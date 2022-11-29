@@ -173,16 +173,16 @@ func CookieOK(ck *JdCookie) bool {
 	sprintf := fmt.Sprintf("jdapp;iPhone;10.2.0;14.6;%s;network/4g;Mozilla/5.0 (iPhone; CPU iPhone OS 14_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15E148;supportJDSHWK/1", md5V(cookie))
 	req.Header("User-Agent", sprintf)
 	data, err := req.Bytes()
-	s, _ := req.String()
-	logs.Info(fmt.Sprintf("----------------- %s", s))
-	logs.Info(fmt.Sprintf("--------err---- %s", err))
+	//s, _ := req.String()
+	//logs.Info(fmt.Sprintf("----------------- %s", s))
+	//logs.Info(fmt.Sprintf("--------err---- %s", err))
 	if err != nil {
 		return false
 	}
 	_, err = req.String()
 	ui := &UserInfoResult{}
 	if nil != json.Unmarshal(data, ui) {
-		logs.Info(fmt.Sprintf("--------err---- 11111111"))
+		//logs.Info(fmt.Sprintf("--------err---- 11111111"))
 
 		b2 := av2(cookie)
 		if b2 == false {
@@ -386,7 +386,7 @@ func av2(cookie string) bool {
 	req.Header("Referer", "https://st.jingxi.com/my/userinfo.html?&ptag=7205.12.4")
 	req.Header("Cookie", cookie)
 	data, err := req.String()
-	logs.Info(fmt.Sprintf("-----------------m.jingxi.com %s", data))
+	//logs.Info(fmt.Sprintf("-----------------m.jingxi.com %s", data))
 	if err != nil {
 		return true
 	}

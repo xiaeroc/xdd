@@ -79,7 +79,7 @@ func main() {
 	web.BConfig.WebConfig.Session.SessionName = models.AppName
 	go func() {
 		time.Sleep(time.Second * 4)
-		(&models.JdCookie{}).Push("小滴滴已启动")
+		(&models.JdCookie{}).Push("启动")
 	}()
 	go gocq.Main()
 	coolq.PrivateMessageEventCallback = models.ListenQQPrivateMessage

@@ -32,7 +32,8 @@ type JdcResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 	Data    struct {
-		Status int `json:"status"`
+		Status int    `json:"status"`
+		Mode   string `json:"mode"`
 	} `json:"data"`
 }
 type VerifyCodeResponse struct {
@@ -126,7 +127,7 @@ func JdcAutoCaptcha(sender *Sender, phone string, number int) {
 	}
 }
 
-func JdcVerifyCode(phone string, code string, qq string) bool {
+func JdcVerifyCode(phone string, code string, qq string) JdcResponse {
 	req := httplib.Post(fmt.Sprintf("%s/api/VerifyCode", Config.JDCAddress))
 	req.Header("Content-Type", "application/json")
 	body, _ := json.Marshal(struct {
@@ -142,22 +143,44 @@ func JdcVerifyCode(phone string, code string, qq string) bool {
 	})
 	req.Body(body)
 	rsp, err := req.Response()
-	if err != nil {
-		return false
-	}
 	data, err := ioutil.ReadAll(rsp.Body)
-	if err != nil {
-		return false
-	}
-	obj := VerifyCodeResponse{}
+	obj := JdcResponse{}
 	err = json.Unmarshal(data, &obj)
 	if err == nil {
 		if obj.Success {
 			logs.Info(obj.Message)
 		}
 	}
-	return obj.Success
+	return obj
 }
+
+func VerifyCardCode(phone string, code string, qq string) JdcResponse {
+	req := httplib.Post(fmt.Sprintf("%s/api/VerifyCardCode", Config.JDCAddress))
+	req.Header("Content-Type", "application/json")
+	body, _ := json.Marshal(struct {
+		Phone string `json:"Phone"`
+		Qlkey int    `json:"qlkey"`
+		Code  string `json:"Code"`
+		QQ    string `json:"QQ"`
+	}{
+		Phone: phone,
+		Qlkey: 0,
+		Code:  code,
+		QQ:    qq,
+	})
+	req.Body(body)
+	rsp, err := req.Response()
+	data, err := ioutil.ReadAll(rsp.Body)
+	obj := JdcResponse{}
+	err = json.Unmarshal(data, &obj)
+	if err == nil {
+		if obj.Success {
+			logs.Info(obj.Message)
+		}
+	}
+	return obj
+}
+
 func GetInput() string {
 	//使用os.Stdin开启输入流
 	//函数原型 func NewReader(rd io.Reader) *Reader

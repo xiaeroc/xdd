@@ -15,7 +15,7 @@ import (
 )
 
 var SendQQ = func(a int64, b interface{}) {
-	//coolq.SendQQ(a, b, Config.QQGroupID)
+	coolq.SendQQ(a, b, Config.QQGroupID)
 }
 var SendQQGroup = func(a int64, b int64, c interface{}) {
 	coolq.SendQQGroup(a, b, c)
@@ -25,9 +25,9 @@ var ListenQQPrivateMessage = func(uid int64, msg string) {
 }
 
 var ListenQQGroupMessage = func(gid int64, uid int64, msg string) {
-	logs.Info(Config.QQGroupIDS)
-	logs.Info(gid)
-	logs.Info(strings.Contains(Config.QQGroupIDS, fmt.Sprintf("%d", gid)))
+	//logs.Info(Config.QQGroupIDS)
+	//logs.Info(gid)
+	//logs.Info(strings.Contains(Config.QQGroupIDS, fmt.Sprintf("%d", gid)))
 	if gid == Config.QQGroupID || strings.Contains(Config.QQGroupIDS, fmt.Sprintf("%d", gid)) {
 		if Config.QbotPublicMode {
 			SendQQGroup(gid, uid, handleMessage(msg, "qqg", int(uid), int(gid)))
@@ -112,53 +112,140 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 					defer delete(codes, id)
 					phone := ss[0]
 					logs.Info(phone)
-					sender.Reply("请稍后，正在模拟环境...")
-					quick := SendSMS(sender, phone)
-					sms_code := ""
+					JdcSendSMS(sender, phone)
+					smsCode := ""
 					select {
-					case sms_code = <-c:
+					case smsCode = <-c:
 						sender.Reply("正在提交验证码...")
-						smsCk := VerifyCode(phone, sms_code, quick)
-						if smsCk.ErrCode == 0 {
-							ck := JdCookie{
-								PtKey: smsCk.Data.PtKey,
-								PtPin: smsCk.Data.PtPin,
-								Hack:  False,
-								QQ:    sender.UserID,
-							}
-							if CookieOK(&ck) {
-								if sender.IsQQ() {
-									ck.QQ = sender.UserID
-								} else if sender.IsTG() {
-									ck.Telegram = sender.UserID
-								}
-								if nck, err := GetJdCookie(ck.PtPin); err == nil {
-									if nck.QQ == 0 {
-										nck.InPoolQQ(ck.PtKey, sender.UserID)
+						code := JdcVerifyCode(phone, smsCode, fmt.Sprintf("%d", sender.UserID))
+						if code.Success {
+							sender.Reply("登陆成功!")
+						} else if code.Data.Status == 555 && code.Data.Mode == "USER_ID" {
+							sender.Reply("您的账号需验证身份,请输入你的身份证前2位与后4位")
+							go func() {
+								d := make(chan string, 1)
+								sfz := "sfz" + strconv.Itoa(sender.UserID)
+								codes = make(map[string]chan string)
+								codes[sfz] = d
+								defer delete(codes, id)
+								phone := ss[0]
+								smsCode := ""
+								select {
+								case smsCode = <-d:
+									sender.Reply("正在提交验证码...")
+									code := VerifyCardCode(phone, smsCode, fmt.Sprintf("%d", sender.UserID))
+									if code.Success {
+										sender.Reply("登陆成功!")
+									} else if code.Data.Status == 555 && code.Data.Mode == "USER_ID" {
+										sender.Reply("您的账号需验证身份,请输入你的身份证前2位与后4位")
+									} else if code.Data.Status == 555 && code.Data.Mode == "HISTORY_DEVICE" {
+										sender.Reply("您的账号需验证设备，请联系管理员")
 									} else {
-										nck.InPool(ck.PtKey)
+										sender.Reply(code.Message)
 									}
-									sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
-								} else {
-									if Cdle {
-										ck.Hack = True
-									}
-									NewJdCookie(&ck)
-									sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+								case <-time.After(time.Second * 60 * 5):
+									sender.Reply("验证码超时。")
+									return
+
 								}
-								for i := range Config.Containers {
-									(&Config.Containers[i]).Write([]JdCookie{ck})
-								}
-							}
-							sender.Reply("登录成功...")
-						} else {
-							sender.Reply("登录失败...")
+								//select {
+								//case sms_code = <-c:
+								//	sender.Reply("正在提交验证码...")
+								//	smsCk := VerifyCode(phone, sms_code, quick)
+								//	if smsCk.ErrCode == 0 {
+								//		ck := JdCookie{
+								//			PtKey: smsCk.Data.PtKey,
+								//			PtPin: smsCk.Data.PtPin,
+								//			Hack:  False,
+								//			QQ:    sender.UserID,
+								//		}
+								//		if CookieOK(&ck) {
+								//			if sender.IsQQ() {
+								//				ck.QQ = sender.UserID
+								//			} else if sender.IsTG() {
+								//				ck.Telegram = sender.UserID
+								//			}
+								//			if nck, err := GetJdCookie(ck.PtPin); err == nil {
+								//				if nck.QQ == 0 {
+								//					nck.InPoolQQ(ck.PtKey, sender.UserID)
+								//				} else {
+								//					nck.InPool(ck.PtKey)
+								//				}
+								//				sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
+								//			} else {
+								//				if Cdle {
+								//					ck.Hack = True
+								//				}
+								//				NewJdCookie(&ck)
+								//				sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+								//			}
+								//			for i := range Config.Containers {
+								//				(&Config.Containers[i]).Write([]JdCookie{ck})
+								//			}
+								//		}
+								//		sender.Reply("登录成功...")
+								//	} else {
+								//		sender.Reply("登录失败...")
+								//	}
+								//case <-time.After(60 * time.Second):
+								//	sender.Reply("验证码超时。")
+								//	return
+								//
+								//}
+								time.Sleep(time.Second)
+							}()
+						} else if code.Data.Status == 555 && code.Data.Mode == "HISTORY_DEVICE" {
+							sender.Reply("您的账号需验证设备，请联系管理员")
 						}
-					case <-time.After(60 * time.Second):
+					case <-time.After(time.Second * 60 * 5):
 						sender.Reply("验证码超时。")
 						return
 
 					}
+					//select {
+					//case sms_code = <-c:
+					//	sender.Reply("正在提交验证码...")
+					//	smsCk := VerifyCode(phone, sms_code, quick)
+					//	if smsCk.ErrCode == 0 {
+					//		ck := JdCookie{
+					//			PtKey: smsCk.Data.PtKey,
+					//			PtPin: smsCk.Data.PtPin,
+					//			Hack:  False,
+					//			QQ:    sender.UserID,
+					//		}
+					//		if CookieOK(&ck) {
+					//			if sender.IsQQ() {
+					//				ck.QQ = sender.UserID
+					//			} else if sender.IsTG() {
+					//				ck.Telegram = sender.UserID
+					//			}
+					//			if nck, err := GetJdCookie(ck.PtPin); err == nil {
+					//				if nck.QQ == 0 {
+					//					nck.InPoolQQ(ck.PtKey, sender.UserID)
+					//				} else {
+					//					nck.InPool(ck.PtKey)
+					//				}
+					//				sender.Reply(fmt.Sprintf("更新账号，%s", ck.PtPin))
+					//			} else {
+					//				if Cdle {
+					//					ck.Hack = True
+					//				}
+					//				NewJdCookie(&ck)
+					//				sender.Reply(fmt.Sprintf("添加账号，%s", ck.PtPin))
+					//			}
+					//			for i := range Config.Containers {
+					//				(&Config.Containers[i]).Write([]JdCookie{ck})
+					//			}
+					//		}
+					//		sender.Reply("登录成功...")
+					//	} else {
+					//		sender.Reply("登录失败...")
+					//	}
+					//case <-time.After(60 * time.Second):
+					//	sender.Reply("验证码超时。")
+					//	return
+					//
+					//}
 					time.Sleep(time.Second)
 				}()
 			}
@@ -170,6 +257,9 @@ var handleMessage = func(msgs ...interface{}) interface{} {
 				if Config.JDCAddress == "" {
 				}
 				if code, ok := codes["qq"+fmt.Sprint(sender.UserID)]; ok {
+					code <- ss[0]
+					logs.Info(code)
+				} else if code, ok := codes["sfz"+fmt.Sprint(sender.UserID)]; ok {
 					code <- ss[0]
 					logs.Info(code)
 				} else {
