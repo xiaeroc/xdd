@@ -1,3 +1,6 @@
+#推广个梯子
+https://xhei.buzz/#/register?code=5Eh5lNwl
+
 # xdd
 基于XDD改版
 ## 更新适配青龙 2.11+ 有问题请 提交issues
